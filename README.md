@@ -46,7 +46,7 @@ Use a location where you have write permission.
 
 ## Release notes
 
-Version 1.0.2 includes clickable boot-mode help, monitor-aware license layout,
+Version 1.0.3 simplifies the main header to text only and retains clickable boot-mode help, monitor-aware license layout,
 clearer startup warnings and manual security-data refresh independent of executable updates.
 The compact download uses executable compression without removing application features.
 

@@ -1,18 +1,18 @@
 {
-  "artifact": "D:\\ZDUMP\\MASTER WEB\\SHANNAPP\\SHANNA STUDIO DEV\\Nawam\\dist\\Nawam-1.0.2-x64.exe",
-  "sha256": "00a586e44dacfaea4102f0e6b992f0903170be0ae798da0625e3a669486b01c9",
+  "artifact": "D:\\ZDUMP\\MASTER WEB\\SHANNAPP\\SHANNA STUDIO DEV\\Nawam\\dist\\Nawam-1.0.3-x64.exe",
+  "sha256": "5ceff81bc54b76cafd67e41c81fe38ab543adee131709ae42ffa3f8bf157a873",
   "bytes": 5079552,
   "metadata": {
     "Comments": "https://nawam.shanna.id",
     "CompanyName": "Shanna Studio",
     "FileDescription": "Nawam Bootable USB Creator",
-    "FileVersion": "1.0.2",
+    "FileVersion": "1.0.3",
     "InternalName": "Nawam",
     "LegalCopyright": "Copyright \u00a9 2026 Shanna Studio; upstream \u00a9 2011-2026 Pete Batard (GPL v3+)",
     "LegalTrademarks": "https://www.gnu.org/licenses/gpl-3.0.html",
     "OriginalFilename": "Nawam.exe",
     "ProductName": "Nawam",
-    "ProductVersion": "1.0.2"
+    "ProductVersion": "1.0.3"
   },
   "embedded_text_bytes": {
     "about_blurb_format": 154,

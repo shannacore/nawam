@@ -57,13 +57,17 @@ class MainDesignTests(unittest.TestCase):
         for name in ("src/format.c", "src/drive.c", "src/badblocks.c", "src/ui_data.h"):
             self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), manifest[name], name)
 
-    def test_header_uses_original_resource_without_new_child_panel(self):
+    def test_header_is_text_only_and_titlebar_icon_is_retained(self):
         source = (ROOT / "src/ui.c").read_text(encoding="utf-8-sig")
         paint = source.split("// Create the horizontal section lines", 1)[1]
         self.assertIn('L"Nawam"', paint)
-        self.assertIn('MAKEINTRESOURCEW(IDI_ICON)', paint)
-        self.assertIn('DrawIconEx', paint)
-        self.assertIn('DestroyIcon', paint)
+        self.assertNotIn('DrawIconEx', paint)
+        self.assertNotIn('LoadImageW', paint)
+        self.assertNotIn('HICON logo', paint)
+        self.assertIn('text.left = metrics.left;', paint)
+        dialogs = (ROOT / 'src/stdlg.c').read_text(encoding='utf-8')
+        self.assertIn('void SetTitleBarIcon(HWND hDlg)', dialogs)
+        self.assertIn('MAKEINTRESOURCE(IDI_ICON)', dialogs)
         self.assertIn('MapDialogRect', paint)
         self.assertIn('SPI_GETHIGHCONTRAST', paint)
         self.assertNotIn('CreateWindow', paint)

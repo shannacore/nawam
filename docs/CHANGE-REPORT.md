@@ -1,5 +1,12 @@
 # Nawam — change and verification report
 
+## 1.0.3 simple-header update
+
+Removed the large logo from the painted main-panel header and aligned its text
+to the normal left margin. The standard title-bar icon and executable icon stay
+unchanged. Control coordinates, callbacks, disk algorithms and website artwork
+are not altered by this cosmetic update.
+
 ## 1.0.2 safety and single-panel design update
 
 Main window has a native Nawam header with the original USB logo, a wider

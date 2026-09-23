@@ -1666,14 +1666,13 @@ void OnPaint(HDC hdc)
 	RECT metrics = { 8, 5, 0, 38 }, client, header, text, section;
 	LOGFONTW lf = { 0 };
 	HFONT title_font = NULL, body_font;
-	HICON logo;
 	HBRUSH brush = (HBRUSH)GetStockObject(DC_BRUSH);
 	BOOL hc = NawamHighContrast();
 	COLORREF accent = hc ? GetSysColor(COLOR_HIGHLIGHT) :
 		(is_darkmode_enabled ? RGB(0x93, 0xC5, 0xFD) : RGB(0x25, 0x63, 0xEB));
 	COLORREF ink = hc ? GetSysColor(COLOR_WINDOWTEXT) :
 		(is_darkmode_enabled ? DARKMODE_NORMAL_TEXT_COLOR : RGB(0x0F, 0x17, 0x2A));
-	int saved = SaveDC(hdc), icon_size, i, line_width;
+	int saved = SaveDC(hdc), i, line_width;
 	if (saved == 0)
 		return;
 	MapDialogRect(hMainDialog, &metrics);
@@ -1683,14 +1682,7 @@ void OnPaint(HDC hdc)
 	SetDCBrushColor(hdc, hc ? GetSysColor(COLOR_BTNFACE) :
 		(is_darkmode_enabled ? DARKMODE_NORMAL_CONTROL_BACKGROUND_COLOR : RGB(0xEF, 0xF6, 0xFF)));
 	FillRect(hdc, &header, brush);
-	icon_size = header.bottom - 2 * metrics.top;
-	// Load the original mint USB resource, without recoloring or redrawing it.
-	logo = (HICON)LoadImageW(hMainInstance, MAKEINTRESOURCEW(IDI_ICON), IMAGE_ICON,
-		icon_size, icon_size, LR_DEFAULTCOLOR);
-	if (logo != NULL) {
-		DrawIconEx(hdc, metrics.left, metrics.top, logo, icon_size, icon_size, 0, NULL, DI_NORMAL);
-		DestroyIcon(logo);
-	}
+	// Keep the panel text-only; the standard window title bar retains its icon.
 	body_font = (HFONT)SendMessage(hMainDialog, WM_GETFONT, 0, 0);
 	if (body_font != NULL && GetObjectW(body_font, sizeof(lf), &lf)) {
 		lf.lfHeight = -MulDiv(20, GetDeviceCaps(hdc, LOGPIXELSY), 72);
@@ -1700,7 +1692,7 @@ void OnPaint(HDC hdc)
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, ink);
 	text = header;
-	text.left = 2 * metrics.left + icon_size;
+	text.left = metrics.left;
 	text.right -= metrics.left;
 	text.top = metrics.top;
 	if (title_font != NULL)

@@ -1,10 +1,10 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "packer": "UPX 5.2.1",
-  "originalSha256": "00a586e44dacfaea4102f0e6b992f0903170be0ae798da0625e3a669486b01c9",
-  "compressedSha256": "9d6a579e180f6746fd077acc08e48fdcb4ccc573f6ad86efc75c6c35bbb050cd",
+  "originalSha256": "5ceff81bc54b76cafd67e41c81fe38ab543adee131709ae42ffa3f8bf157a873",
+  "compressedSha256": "e0d87aa85c3611c9b91c9101438dcca93f9d6d135657aebb4ab19981ea3d87b6",
   "originalBytes": 5079552,
-  "compressedBytes": 1880064,
+  "compressedBytes": 1879040,
   "checkedSections": [
     ".text",
     ".data",
@@ -21,6 +21,6 @@
   "resourceContentsIdentical": true,
   "importsIdentical": true,
   "peHardeningPreserved": true,
-  "runtime": "Verified final compact executable launched: 476x610 single-panel Nawam header, original logo, USB detection and disabled Start before ISO selection. No physical writes.",
+  "runtime": "Not yet verified for compact variant",
   "note": "UPX rebuilds import/resource layout and PE checksum; decompressed file need not be byte-identical."
 }

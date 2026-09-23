@@ -42,7 +42,7 @@
       <h1 id="hero-title">One USB.<br>A fresh <em>start.</em></h1>
       <p class="hero-description">From an ISO file to bootable media. Prepare a Windows installation, run Linux, or give your device a new start—with control still in your hands.</p>
       <div class="actions"><a class="button primary" href="#unduh">Get Nawam <span aria-hidden="true">↓</span></a><a class="text-link" href="#cara-pakai">See how it works <span aria-hidden="true">↗</span></a></div>
-      <p class="hero-meta">Version 1.0.2 <span>·</span> Windows x64 <span>·</span> No installer</p>
+      <p class="hero-meta">Version 1.0.3 <span>·</span> Windows x64 <span>·</span> No installer</p>
       <div class="developer-mark"><span class="thin-rule"></span><span>DEVELOPED BY<br><strong>SHANNA Digital Systems</strong></span></div>
     </div>
     <figure class="product-shot">
@@ -88,7 +88,7 @@
   </section>
   <section id="kompatibilitas" class="section container compatibility" aria-labelledby="compat-title">
     <div><p class="eyebrow">03 / KNOW YOUR CONFIGURATION</p><h2 id="compat-title">Compatibility is<br><span class="muted">about the right match.</span></h2><p>The image, destination computer's firmware, and USB device determine which options are available. Not every combination works with every ISO.</p><p class="small">Nawam runs on Windows. Creating Linux media does not mean Nawam runs directly on Linux or macOS.</p></div>
-    <div class="table-wrap"><table><caption>Nawam 1.0.2 compatibility</caption><tbody>
+    <div class="table-wrap"><table><caption>Nawam 1.0.3 compatibility</caption><tbody>
       <tr><th scope="row">Host system</th><td>Test target: Windows 11 x64<br><small>Windows 10 x64: supported by the source base, but has not been tested with this build.</small></td></tr>
       <tr><th scope="row">Download architecture</th><td>x64 (64-bit)<br><small>x86 and ARM64 downloads are not provided yet.</small></td></tr>
       <tr><th scope="row">Image sources</th><td>Windows installation ISOs and bootable Linux ISOs</td></tr>
@@ -101,14 +101,14 @@
   </section>
   <section id="unduh" class="download-section" aria-labelledby="download-title"><div class="container download-layout">
     <div><p class="eyebrow">04 / NAWAM FOR WINDOWS</p><h2 id="download-title">Prepare your<br>next USB.</h2><p>One application file. No installer.<br>Download, check, then run.</p><a href="/en/open-source.html" class="text-link">License & source code <span aria-hidden="true">↗</span></a></div>
-    <div class="download-box"><div class="release-line"><span class="release-badge">EARLY RELEASE</span><span>v1.0.2</span></div><h3>Nawam for Windows x64</h3><p id="download-meta">Early build • 64-bit • .exe</p>
-      <a id="download-button" class="button primary full" href="https://github.com/shannacore/nawam/releases/download/v1.0.2/Nawam.exe" download="Nawam.exe">Download Nawam for Windows <span aria-hidden="true">↓</span></a>
+    <div class="download-box"><div class="release-line"><span class="release-badge">EARLY RELEASE</span><span>v1.0.3</span></div><h3>Nawam for Windows x64</h3><p id="download-meta">Early build • 64-bit • .exe</p>
+      <a id="download-button" class="button primary full" href="https://github.com/shannacore/nawam/releases/download/v1.0.3/Nawam.exe" download="Nawam.exe">Download Nawam for Windows <span aria-hidden="true">↓</span></a>
       <p class="download-disclaimer">This build is not digitally signed (code-signing). Windows may display “Unknown publisher”. Check the download source and checksum before running it.</p>
       <div class="hash-box"><span class="mono">SHA-256</span><code id="release-hash">The checksum is included with the release package.</code><button type="button" id="copy-hash" disabled>Copy checksum</button></div><p id="copy-status" class="small" role="status" aria-live="polite"></p>
       <p class="small release-caution">Test status: x64 build and non-destructive checks. Automated physical USB write testing has not been performed; always back up your data.</p>
     </div>
   </div></section>
-  <section id="rilis" class="section container release-section" aria-labelledby="release-title"><div><p class="eyebrow">DEVELOPMENT NOTES</p><h2 id="release-title">Nawam's<br>first steps.</h2></div><article class="release-notes"><div class="release-heading"><h3>1.0.2</h3><span>Identity update</span></div><ul><li>Application publisher: Shanna Studio. About is simplified to copyright and the custom website nawam.shanna.id.</li><li>Nawam identity and a Fresh Mint USB vector icon.</li><li>ISO-based bootable USB creation and disk settings from the underlying open-source implementation.</li><li>Separate <code>nawam.ini</code> configuration, log, and preference storage.</li><li>A Windows x64 build with executable metadata and hardening checks.</li></ul><p class="small">Automatic updates are not available yet. New versions must be downloaded manually from this page. This list does not claim that every image and device has been tested.</p></article></section>
+  <section id="rilis" class="section container release-section" aria-labelledby="release-title"><div><p class="eyebrow">DEVELOPMENT NOTES</p><h2 id="release-title">Nawam's<br>first steps.</h2></div><article class="release-notes"><div class="release-heading"><h3>1.0.3</h3><span>Simple header</span></div><ul><li>Application publisher: Shanna Studio. About is simplified to copyright and the custom website nawam.shanna.id.</li><li>Nawam identity and a Fresh Mint USB vector icon.</li><li>ISO-based bootable USB creation and disk settings from the underlying open-source implementation.</li><li>Separate <code>nawam.ini</code> configuration, log, and preference storage.</li><li>A Windows x64 build with executable metadata and hardening checks.</li></ul><p class="small">Automatic updates are not available yet. New versions must be downloaded manually from this page. This list does not claim that every image and device has been tested.</p></article></section>
   <section id="faq" class="section container faq-layout" aria-labelledby="faq-title"><div><p class="eyebrow">BEFORE YOU BEGIN</p><h2 id="faq-title">Frequently asked<br>questions.</h2><p>No need to guess before working with important data.</p></div><div class="faq-items">
     <details><summary>Is Nawam free?</summary><p>Yes. Nawam is free software under GPL version 3 or later. See the <a href="/en/open-source.html">license and attribution</a> for details about the source base and third-party components.</p></details>
     <details><summary>Will files on my USB be erased?</summary><p>Yes. Formatting and creating bootable media can erase all data on the target device. Back up first, verify the drive name and capacity, then read every confirmation.</p></details>
