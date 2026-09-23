@@ -32,7 +32,7 @@ try {
         assert.equal(response.status(), path === '/404.html' ? 404 : 200, path);
         assert.equal(await page.locator('html').getAttribute('lang'), lang);
         assert.equal(await page.locator('h1').count(), 1);
-        assert.equal(await page.locator('.language-switch a').count(), 2);
+        assert.equal(await page.locator('.language-switch a').count(), 1);
         assert.ok(await page.evaluate(() => [...document.images].every(i => i.complete && i.naturalWidth > 0)));
         const size = await page.evaluate(() => ({width: innerWidth, content: document.documentElement.scrollWidth}));
         const switchTarget = `${lang === 'en' ? '/' : '/en/'}${name}`;

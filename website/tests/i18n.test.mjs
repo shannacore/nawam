@@ -18,14 +18,14 @@ test('five complete static English pages have paired navigation and search metad
       assert.ok(html.includes(`rel="canonical" href="https://nawam.web.app${route(page, lang)}"`));
       for (const alternate of ['id', 'en']) {
         assert.ok(html.includes(`hreflang="${alternate}" href="https://nawam.web.app${route(page, alternate)}"`));
-        assert.ok(html.includes(`href="${route(page, alternate)}" lang="${alternate}" hreflang="${alternate}"`));
+        if (alternate !== lang) assert.ok(html.includes(`href="${route(page, alternate)}" lang="${alternate}" hreflang="${alternate}"`));
       }
       assert.ok(html.includes('hreflang="x-default"'));
       assert.ok(html.includes('class="language-switch"'));
       assert.ok(html.includes('data-language-link'));
       assert.ok(html.includes('/assets/i18n.css'));
       assert.ok(html.includes('/assets/site.js'));
-      assert.ok(html.includes('aria-current="page"'));
+      assert.ok(html.includes(`data-current-language="${lang}"`));
       for (const m of html.matchAll(/(?:src|href)="(\/[^"#?]*)"/g)) {
         const asset = m[1].endsWith('/') ? `${m[1]}index.html` : m[1];
         assert.ok(existsSync(resolve(root, `public${asset}`)), `Missing ${asset}`);
@@ -39,7 +39,7 @@ test('English content includes every home section, warnings, legal and privacy d
   const id = read('public/index.html');
   for (const match of id.matchAll(/id="([^"]+)"/g)) assert.ok(html.includes(match[0]), match[1]);
   assert.equal([...html.matchAll(/<details>/g)].length, [...id.matchAll(/<details>/g)].length);
-  for (const text of ['not digitally signed', 'physical USB', 'Windows 10 x64', 'not been tested', 'nawam.ini', 'not a screenshot']) assert.ok(html.includes(text), text);
+  for (const text of ['not digitally signed', 'physical USB', 'Windows 10 x64', 'not been tested', 'nawam.ini', 'Actual Nawam screenshot']) assert.ok(html.includes(text), text);
   assert.ok(!/\b(Unduh|Perangkat|Privasi|Kembali|Sistem berkas|belum|Anda|pengaturan)\b/.test(html));
   const legal = read('public/en/open-source.html');
   for (const text of ['Pete Batard', 'GNU General Public License', 'not an official Rufus release', 'Manrope', 'without warranty']) assert.ok(legal.includes(text), text);

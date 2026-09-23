@@ -56,6 +56,12 @@ Primary site: https://nawam.web.app. No custom DNS configuration is needed.
 The previous `nawam-shanna` Hosting site is disabled after new-site verification.
 The Firebase PROJECT remains `nawam-shanna`; the active Hosting SITE is `nawam`.
 
+## Header, footer and real imagery
+
+Header is non-sticky, with flag-only language links and accessible names.
+The footer omits the product-description/Developed-by paragraph.
+The original logo remains unchanged.
+
 ## Light design and languages
 
 The website uses the owner's light palette: white navigation/cards, #F8FAFC
@@ -78,8 +84,8 @@ Existing release1.0.1 downloads stay unchanged during the website-only redesign.
 - `public/privacy.html`: actual data practices.
 - `firebase.json`: dedicated Hosting site, caching and security headers.
 
-The main preview is a clearly labeled SVG UI illustration for legibility, not
-a screenshot or proof of runtime state. The original app screenshot is linked separately.
+The main preview is the unedited actual application screenshot captured during
+QA, displayed no larger than its native resolution. No simulated interface is used.
 Never claim physical-drive write/boot tests unless they have been performed.
 Self-updates remain disabled in the desktop application.
 
