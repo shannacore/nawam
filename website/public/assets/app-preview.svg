@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 710" role="img" aria-labelledby="t d">
+<title id="t">Ilustrasi antarmuka Nawam</title><desc id="d">Ilustrasi vector, bukan screenshot. Pilihan USB, ISO, GPT, UEFI, filesystem dan status.</desc>
+<rect x="1" y="1" width="558" height="708" rx="16" fill="#F6FAF9" stroke="#46595D" stroke-width="2"/>
+<path d="M17 1h526a16 16 0 0 1 16 16v43H1V17A16 16 0 0 1 17 1" fill="#DFE8E5"/>
+<g font-family="Segoe UI,Arial,sans-serif" font-size="17" fill="#152E28">
+<text x="28" y="38" font-size="21" font-weight="600">Nawam 1.0.0</text><text x="452" y="37">−</text><text x="515" y="37">×</text>
+<text x="28" y="100" font-size="22" font-weight="700">Properti Drive</text>
+<text x="28" y="133">Perangkat</text>
+<rect x="28" y="147" width="504" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<text x="42" y="176">USB Drive • 32 GB</text><path d="m502 166 6 6 6-6" fill="none" stroke="#152E28" stroke-width="2"/>
+<text x="28" y="220">Pilihan Boot</text>
+<rect x="28" y="234" width="356" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<text x="42" y="263">Pilih file ISO Anda</text>
+<rect x="398" y="234" width="134" height="44" rx="5" fill="#10B981"/><text x="465" y="263" text-anchor="middle" font-weight="700">PILIH</text>
+<text x="28" y="310">Skema partisi</text><text x="294" y="310">Sistem target</text>
+<rect x="28" y="324" width="238" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<rect x="294" y="324" width="238" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<text x="42" y="353">GPT</text><text x="308" y="353">UEFI (non CSM)</text>
+<path d="m236 343 6 6 6-6m254 0 6 6 6-6" fill="none" stroke="#152E28" stroke-width="2"/>
+<text x="28" y="410" font-size="22" font-weight="700">Opsi Format</text>
+<text x="28" y="443">Label volume</text><rect x="28" y="457" width="504" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<text x="42" y="486">USB BOOTABLE</text>
+<text x="28" y="533">Sistem berkas</text><text x="294" y="533">Ukuran klaster</text>
+<rect x="28" y="547" width="238" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<rect x="294" y="547" width="238" height="44" rx="5" fill="#FFF" stroke="#AABDB7"/>
+<text x="42" y="576">NTFS</text><text x="308" y="576">4096 byte</text>
+<text x="28" y="630" font-size="18" font-weight="600">Status: SIAP</text>
+<rect x="28" y="648" width="504" height="12" rx="6" fill="#D8E7E1"/>
+<text x="28" y="688" font-size="14" fill="#546B63">Ilustrasi UI • Pengaturan mengikuti perangkat &amp; ISO</text>
+</g></svg>

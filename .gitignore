@@ -1,0 +1,31 @@
+# Never commit credentials, installed toolchains or personal/runtime state.
+tools/
+**/node_modules/
+**/__pycache__/
+*.pyc
+.env
+.env.*
+*service-account*.json
+.firebaserc.local
+# Generated build outputs
+config.log
+config.status
+Makefile
+.mingw/Makefile
+.mingw/*.lib
+.mingw/*.def64
+src/**/Makefile
+res/loc/Makefile
+res/loc/embedded.loc
+*.o
+*.a
+src/rufus.exe
+dist/
+# Generated QA/debug logs can contain local paths or drive labels.
+docs/*log
+docs/qa-*.json
+website/artifacts/
+website/.firebase/
+website/*debug.log*
+# Release artifacts are distributed by Firebase, not duplicated in git.
+website/public/downloads/

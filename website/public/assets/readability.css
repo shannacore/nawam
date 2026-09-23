@@ -1,0 +1,39 @@
+/* Larger, clearer typography requested by the product owner. */
+:root{--max:1320px;--muted:#b9c6d1}
+body{font-size:18px}
+.header nav{font-size:15px;gap:24px}
+.hero{grid-template-columns:1.05fr 1fr;gap:56px;padding-block:55px 65px}
+.hero-description{font-size:20px;line-height:1.75;max-width:580px}
+.hero h1{font-size:clamp(52px,5.4vw,84px)}
+h2{font-size:clamp(36px,3.9vw,54px)}
+.button,.text-link,.tabs button{font-size:16px}
+.button{min-height:56px}
+.eyebrow,.mono,.panel-tag{font-size:13px}
+.hero-meta{font-size:14px;flex-wrap:wrap}
+.developer-mark{font-size:12px}.developer-mark strong{font-size:15px}
+.shot-canvas{padding:22px;background-image:none;background:#13201e}
+.shot-canvas img{max-width:560px;width:100%;border:0;box-shadow:none}
+.shot-heading,.product-shot figcaption{font-size:13px}
+.spec-inner{font-size:14px}.spec-inner b{font-size:17px}
+.section-intro>p:last-child,.feature-lead p,.feature-list dd,.tab-panels p,
+.section-heading>p,.steps p,.compatibility>div>p:not(.eyebrow),
+.download-layout>div>p:not(.eyebrow),.release-notes ul,.faq-layout>div>p:last-child,
+details>p,.legal p,.legal li{font-size:17px}
+.feature-list dt{font-size:20px}.feature-list dt span{font-size:13px}
+.steps h3{font-size:23px}.step-number{font-size:16px}
+.check-list{font-size:16px}.tabs{width:auto;max-width:100%}
+.safety-note strong{font-size:17px}.safety-note p{font-size:16px}
+table{font-size:16px}td small{font-size:14px}
+.small,.download-disclaimer,.release-caution{font-size:14px!important}
+#download-meta{font-size:15px}.hash-box code{font-size:13px}
+.hash-box button{font-size:15px}.hash-box>.mono{font-size:12px}
+.release-line,.release-heading span,.release-badge{font-size:13px}
+summary{font-size:18px;min-height:76px}
+.footer-main p,.footer nav{font-size:14px}.footer-bottom{font-size:12px}
+.brand img{width:46px;height:46px}
+.feature-lead p,.section-intro>p:last-child{max-width:100%}
+.faq-layout,.compatibility,.section-intro{gap:60px}
+.section-heading>p{max-width:400px}
+@media(max-width:1050px){.hero{gap:30px}.header nav{gap:15px;font-size:14px}.container{width:calc(100% - 48px)}.hero-description{font-size:18px}.faq-layout,.compatibility,.section-intro{gap:36px}}
+@media(max-width:780px){.container{width:calc(100% - 36px)}.hero{grid-template-columns:1fr;padding-top:32px;gap:35px}.hero h1{font-size:clamp(52px,10vw,72px)}.hero-description{font-size:19px}.header nav{font-size:17px}.hero .eyebrow{font-size:12px}.product-shot{max-width:580px}.shot-canvas{padding:10px}.shot-canvas img{max-width:560px}.hero-meta{font-size:14px}.feature-list dd,.steps p,.tab-panels p,details>p,.release-notes ul{font-size:16px}.small,.download-disclaimer,.release-caution,.footer-main p,.footer nav{font-size:14px!important}.footer-bottom{font-size:12px}.table-wrap th,.table-wrap td{font-size:15px;padding:15px 12px}.shot-heading,.product-shot figcaption{font-size:12px}.tabs button{font-size:16px;padding-inline:12px}.spec-inner{font-size:13px}.spec-inner b{font-size:16px}.actions{gap:18px}.button{gap:20px}.feature-lead{padding:28px}.feature-list{padding-inline:25px}.faq-layout,.compatibility,.section-intro{gap:32px}}
+@media(max-width:380px){.hero h1{font-size:50px}.hero .eyebrow{font-size:11px;letter-spacing:.04em}.tabs button{font-size:14px}.table-wrap th,.table-wrap td{font-size:14px}.brand{font-size:27px}.hero-meta{gap:8px}.download-box{padding:20px}.download-box h3{font-size:24px}}

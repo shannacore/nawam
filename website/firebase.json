@@ -1,0 +1,22 @@
+{
+  "hosting": {
+    "site": "nawam",
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "downloads/**"],
+    "headers": [
+      {"source": "**", "headers": [
+        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"},
+        {"key": "X-Content-Type-Options", "value": "nosniff"},
+        {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
+        {"key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()"},
+        {"key": "X-Frame-Options", "value": "DENY"}
+      ]},
+      {"source": "**/*.html", "headers": [{"key": "Cache-Control", "value": "public,max-age=300"}]},
+      {"source": "/assets/**", "headers": [{"key": "Cache-Control", "value": "public,max-age=3600"}]},
+      {"source": "/release.json", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
+      {"source": "/downloads/**", "headers": [{"key": "Cache-Control", "value": "public,max-age=3600"}, {"key": "X-Robots-Tag", "value": "noindex"}]},
+      {"source": "/downloads/*.exe", "headers": [{"key": "Content-Type", "value": "application/octet-stream"}, {"key": "Content-Disposition", "value": "attachment; filename=\"Nawam.exe\""}]}
+    ]
+  },
+  "emulators": {"hosting": {"port": 5081}, "ui": {"enabled": false}}
+}

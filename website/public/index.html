@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070B14">
+  <title>Nawam — Bootable USB Creator untuk Windows</title>
+  <meta name="description" content="Siapkan USB instalasi Windows dan media bootable Linux dari ISO dengan Nawam. Aplikasi Windows native dari SHANNA Digital Systems. GPT, MBR, UEFI, dan Legacy BIOS sesuai image.">
+  <link rel="canonical" href="https://nawam.web.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:title" content="Nawam — Satu USB. Awal yang baru.">
+  <meta property="og:description" content="Bootable USB Creator untuk Windows. Dibuat untuk mempersiapkan langkah berikutnya.">
+  <meta property="og:url" content="https://nawam.web.app/">
+  <meta property="og:image" content="https://nawam.web.app/assets/social.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/x-icon" href="/assets/nawam.ico">
+  <link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/readability.css">
+  <script type="module" src="/assets/site.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#konten">Lewati ke konten</a>
+<header class="header">
+  <div class="container nav-wrap">
+    <a class="brand" href="/" aria-label="Nawam, beranda"><img src="/assets/nawam.svg" width="38" height="38" alt=""><span>nawam<span class="brand-dot">.</span></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation">Menu <span aria-hidden="true">＋</span></button>
+    <nav id="navigation" aria-label="Navigasi utama">
+      <a href="#fitur">Fitur</a><a href="#cara-pakai">Cara pakai</a><a href="#kompatibilitas">Kompatibilitas</a><a href="#faq">FAQ</a>
+      <a class="nav-cta" href="#unduh">Unduh Nawam <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+</header>
+<main id="konten">
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> BOOTABLE USB CREATOR / WINDOWS</p>
+      <h1 id="hero-title">Satu USB.<br>Awal yang <em>baru.</em></h1>
+      <p class="hero-description">Dari file ISO ke media bootable. Siapkan instalasi Windows, jalankan Linux, atau mulai ulang perangkat Anda—dengan kontrol yang tetap di tangan Anda.</p>
+      <div class="actions"><a class="button primary" href="#unduh">Dapatkan Nawam <span aria-hidden="true">↓</span></a><a class="text-link" href="#cara-pakai">Lihat cara kerjanya <span aria-hidden="true">↗</span></a></div>
+      <p class="hero-meta">Versi 1.0.0 <span>·</span> Windows x64 <span>·</span> Tanpa installer</p>
+      <div class="developer-mark"><span class="thin-rule"></span><span>DIKEMBANGKAN OLEH<br><strong>SHANNA Digital Systems</strong></span></div>
+    </div>
+    <figure class="product-shot">
+      <div class="shot-heading"><span><i aria-hidden="true"></i> Nawam / ilustrasi antarmuka</span><span>01—01</span></div>
+      <div class="shot-canvas"><a href="/assets/app-preview.svg" target="_blank" rel="noopener" aria-label="Perbesar ilustrasi antarmuka Nawam"><img src="/assets/app-preview.svg" alt="Ilustrasi vector antarmuka Nawam: USB, ISO, GPT, UEFI, filesystem, dan status. Bukan screenshot." width="560" height="710" fetchpriority="high"></a></div>
+      <figcaption><a href="/assets/nawam-app.png" target="_blank" rel="noopener">Lihat screenshot aplikasi asli ↗</a><span>Vector preview</span></figcaption>
+    </figure>
+  </section>
+  <div class="spec-strip"><div class="container spec-inner"><span><b>ISO → USB</b> Alur yang terarah</span><span><b>GPT / MBR</b> Pilih skema partisi</span><span><b>UEFI / BIOS</b> Sesuai image & perangkat</span><span><b>GPL v3+</b> Gratis & open source</span></div></div>
+  <section id="fitur" class="section container" aria-labelledby="features-title">
+    <div class="section-intro"><p class="eyebrow">01 / KENDALI, TANPA KERUMITAN</p><h2 id="features-title">Yang Anda perlukan.<br><span class="muted">Tidak lebih rumit.</span></h2><p>Pilih image, tentukan perangkat, lalu periksa pengaturannya. Nawam mempertahankan alur utility Windows yang ringkas, dengan informasi yang dibutuhkan sebelum proses dimulai.</p></div>
+    <div class="feature-layout">
+      <div class="feature-lead"><span class="mono">SUMBER → TUJUAN</span><h3>Satu alur untuk<br>berbagai kebutuhan.</h3><p>ISO Windows untuk instalasi ulang. ISO Linux untuk instalasi atau live environment. Pilihan boot menyesuaikan isi image, bukan sekadar ekstensi file.</p><a href="#kompatibilitas" class="text-link">Pahami kompatibilitas <span aria-hidden="true">↗</span></a><div class="flow" aria-label="File ISO ke USB bootable"><span>.iso</span><span aria-hidden="true">→</span><span>USB</span></div></div>
+      <dl class="feature-list">
+        <div><dt><span>01</span> Perangkat yang jelas</dt><dd>Lihat nama dan kapasitas drive USB sebelum memilih tujuan. Hard disk USB tambahan tidak ditampilkan secara default.</dd></div>
+        <div><dt><span>02</span> Pengaturan yang relevan</dt><dd>Skema GPT atau MBR, target UEFI atau BIOS, sistem berkas, ukuran klaster, dan label volume dalam satu jendela.</dd></div>
+        <div><dt><span>03</span> Proses yang terlihat</dt><dd>Pantau progres dan status. Buka log untuk melihat informasi deteksi image, perangkat, dan detail proses.</dd></div>
+        <div><dt><span>04</span> Portabel saat dibutuhkan</dt><dd>Jalankan satu executable. Tambahkan <code>nawam.ini</code> di sampingnya untuk menyimpan preferensi secara portabel.</dd></div>
+      </dl>
+    </div>
+  </section>
+  <section class="use-section" aria-labelledby="use-title"><div class="container use-layout">
+    <div><p class="eyebrow">SIAPKAN LANGKAH BERIKUTNYA</p><h2 id="use-title">Media yang tepat.<br>Untuk tujuan Anda.</h2><div class="tabs" role="tablist" aria-label="Kebutuhan penggunaan">
+      <button id="tab-windows" role="tab" aria-controls="panel-windows" aria-selected="true" type="button">Windows</button>
+      <button id="tab-linux" role="tab" aria-controls="panel-linux" aria-selected="false" tabindex="-1" type="button">Linux</button>
+      <button id="tab-format" role="tab" aria-controls="panel-format" aria-selected="false" tabindex="-1" type="button">Format USB</button>
+    </div></div>
+    <div class="tab-panels">
+      <div id="panel-windows" role="tabpanel" aria-labelledby="tab-windows" tabindex="0"><span class="panel-tag">INSTALLATION MEDIA</span><h3>Mulai dengan instalasi yang baru.</h3><p>Gunakan ISO Windows dari sumber resmi untuk menyiapkan USB instalasi. Pilih target boot yang sesuai dengan firmware komputer tujuan.</p><ul class="check-list"><li>Image Windows dipindai sebelum digunakan</li><li>GPT untuk perangkat UEFI yang sesuai</li><li>Opsi mengikuti versi dan isi image Windows</li></ul></div>
+      <div id="panel-linux" role="tabpanel" aria-labelledby="tab-linux" tabindex="0" hidden><span class="panel-tag">INSTALL / LIVE ENVIRONMENT</span><h3>Bawa lingkungan Linux Anda.</h3><p>Buat media dari ISO distribusi pilihan. Ketersediaan mode ISO, DD, dan persistence bergantung pada struktur serta dukungan image.</p><ul class="check-list"><li>Dukungan image Linux bootable</li><li>UEFI atau BIOS sesuai bootloader image</li><li>Komponen boot tambahan dapat memerlukan internet</li></ul></div>
+      <div id="panel-format" role="tabpanel" aria-labelledby="tab-format" tabindex="0" hidden><span class="panel-tag">NON-BOOTABLE MEDIA</span><h3>Kembalikan USB menjadi ruang penyimpanan.</h3><p>Pilih mode non-bootable untuk memformat perangkat. Tentukan sistem berkas, label volume, dan ukuran klaster yang tersedia untuk drive Anda.</p><ul class="check-list"><li>Pilihan FAT32, NTFS, exFAT, dan lainnya sesuai perangkat</li><li>Quick format dan opsi pemeriksaan blok</li><li>Seluruh data pada target dapat terhapus</li></ul></div>
+    </div>
+  </div></section>
+  <section id="cara-pakai" class="section container" aria-labelledby="steps-title">
+    <div class="section-heading"><div><p class="eyebrow">02 / DARI ISO KE USB</p><h2 id="steps-title">Empat langkah.<br>Satu tujuan yang jelas.</h2></div><p>Siapkan file ISO tepercaya dan USB dengan kapasitas yang cukup. Cadangkan data USB sebelum melanjutkan.</p></div>
+    <ol class="steps">
+      <li><span class="step-number">01</span><h3>Hubungkan USB</h3><p>Jalankan Nawam, lalu cocokkan nama dan kapasitas perangkat. Jangan memilih drive hanya berdasarkan hurufnya.</p></li>
+      <li><span class="step-number">02</span><h3>Pilih file ISO</h3><p>Klik PILIH, cari image Windows atau Linux Anda, lalu tunggu pemindaian image selesai.</p></li>
+      <li><span class="step-number">03</span><h3>Periksa pengaturan</h3><p>Pastikan skema partisi, target sistem, dan sistem berkas sesuai komputer tujuan. Pertahankan nilai bawaan jika sudah sesuai.</p></li>
+      <li><span class="step-number">04</span><h3>Mulai & tunggu</h3><p>Klik MULAI hanya setelah yakin. Baca konfirmasi penghapusan dan tunggu status selesai sebelum melepas USB.</p></li>
+    </ol>
+    <aside class="safety-note"><span class="safety-symbol" aria-hidden="true">!</span><div><strong>Periksa drive dua kali. Data USB akan terhapus.</strong><p>Pembuatan media bootable dan format merupakan operasi destructive. Cadangkan data penting. Jangan cabut USB atau matikan komputer saat proses berlangsung.</p></div></aside>
+  </section>
+  <section id="kompatibilitas" class="section container compatibility" aria-labelledby="compat-title">
+    <div><p class="eyebrow">03 / KENALI KONFIGURASI ANDA</p><h2 id="compat-title">Kompatibel itu<br><span class="muted">soal kecocokan.</span></h2><p>Image, firmware komputer tujuan, dan perangkat USB menentukan pilihan yang tersedia. Tidak semua kombinasi bisa digunakan untuk setiap ISO.</p><p class="small">Nawam berjalan di Windows. Membuat media Linux tidak berarti Nawam dapat dijalankan langsung di Linux atau macOS.</p></div>
+    <div class="table-wrap"><table><caption>Kompatibilitas Nawam 1.0.0</caption><tbody>
+      <tr><th scope="row">Sistem host</th><td>Target pengujian: Windows 11 x64<br><small>Windows 10 x64: didukung basis source, belum diuji pada build ini.</small></td></tr>
+      <tr><th scope="row">Arsitektur unduhan</th><td>x64 (64-bit)<br><small>x86 dan ARM64 belum disediakan sebagai unduhan.</small></td></tr>
+      <tr><th scope="row">Sumber image</th><td>ISO instalasi Windows dan ISO Linux bootable</td></tr>
+      <tr><th scope="row">Skema partisi</th><td>GPT / MBR</td></tr>
+      <tr><th scope="row">Mode boot</th><td>UEFI / Legacy BIOS<br><small>Tergantung firmware dan bootloader dalam ISO.</small></td></tr>
+      <tr><th scope="row">Sistem berkas</th><td>FAT/FAT32, NTFS, exFAT, UDF, dan opsi lain yang tersedia<br><small>Disesuaikan ukuran drive, OS, dan kebutuhan image.</small></td></tr>
+      <tr><th scope="row">Hak akses</th><td>Administrator, diperlukan untuk mengakses perangkat disk</td></tr>
+      <tr><th scope="row">Koneksi internet</th><td>ISO lokal dapat digunakan tanpa mengunduh ISO lagi.<br><small>Image tertentu memerlukan komponen boot tambahan.</small></td></tr>
+    </tbody></table></div>
+  </section>
+  <section id="unduh" class="download-section" aria-labelledby="download-title"><div class="container download-layout">
+    <div><p class="eyebrow">04 / NAWAM UNTUK WINDOWS</p><h2 id="download-title">Siapkan USB<br>berikutnya.</h2><p>Satu file aplikasi. Tanpa installer.<br>Unduh, periksa, lalu jalankan.</p><a href="/open-source.html" class="text-link">Lisensi & kode sumber <span aria-hidden="true">↗</span></a></div>
+    <div class="download-box"><div class="release-line"><span class="release-badge">RILIS AWAL</span><span>v1.0.0</span></div><h3>Nawam untuk Windows x64</h3><p id="download-meta">Build awal • 64-bit • .exe</p>
+      <a id="download-button" class="button primary full" href="https://github.com/shannacore/nawam-releases/releases/download/v1.0.0/Nawam.exe" download="Nawam.exe">Unduh Nawam untuk Windows <span aria-hidden="true">↓</span></a>
+      <p class="download-disclaimer">Build ini belum ditandatangani secara digital (code-signing). Windows dapat menampilkan “Unknown publisher”. Periksa sumber unduhan dan checksum sebelum menjalankan.</p>
+      <div class="hash-box"><span class="mono">SHA-256</span><code id="release-hash">Checksum tersedia bersama paket rilis.</code><button type="button" id="copy-hash" disabled>Salin checksum</button></div><p id="copy-status" class="small" role="status" aria-live="polite"></p>
+      <p class="small release-caution">Status pengujian: build x64 dan pemeriksaan non-destructive. Penulisan USB fisik belum diuji otomatis; selalu cadangkan data.</p>
+    </div>
+  </div></section>
+  <section id="rilis" class="section container release-section" aria-labelledby="release-title"><div><p class="eyebrow">CATATAN PENGEMBANGAN</p><h2 id="release-title">Langkah pertama<br>Nawam.</h2></div><article class="release-notes"><div class="release-heading"><h3>1.0.0</h3><span>Initial build</span></div><ul><li>Identitas Nawam dan icon USB vector Fresh Mint.</li><li>Pembuatan USB bootable berbasis ISO serta pengaturan disk dari implementasi open-source yang mendasarinya.</li><li>Konfigurasi <code>nawam.ini</code>, log, dan penyimpanan preferensi tersendiri.</li><li>Build Windows x64 dengan pemeriksaan metadata dan hardening executable.</li></ul><p class="small">Pembaruan otomatis belum tersedia. Versi baru harus diunduh secara manual dari halaman ini. Daftar ini bukan klaim bahwa semua image dan perangkat telah diuji.</p></article></section>
+  <section id="faq" class="section container faq-layout" aria-labelledby="faq-title"><div><p class="eyebrow">SEBELUM ANDA MULAI</p><h2 id="faq-title">Pertanyaan yang<br>sering muncul.</h2><p>Tidak perlu menebak sebelum menyentuh data penting.</p></div><div class="faq-items">
+    <details><summary>Apakah Nawam gratis?</summary><p>Ya. Nawam merupakan perangkat lunak bebas di bawah GPL versi 3 atau yang lebih baru. Lihat <a href="/open-source.html">lisensi dan attribution</a> untuk detail basis source serta komponen pihak ketiga.</p></details>
+    <details><summary>Apakah file dalam USB akan terhapus?</summary><p>Ya. Format dan pembuatan media bootable dapat menghapus seluruh data pada perangkat tujuan. Cadangkan terlebih dahulu, verifikasi nama dan kapasitas drive, lalu baca setiap konfirmasi.</p></details>
+    <details><summary>Harus pilih GPT atau MBR?</summary><p>GPT umumnya digunakan untuk sistem UEFI modern, sedangkan MBR digunakan pada banyak sistem Legacy BIOS. Ikuti kebutuhan firmware dan image Anda. Jangan mengganti mode hanya karena dianggap lebih baru.</p></details>
+    <details><summary>Apakah semua ISO bisa dibuat bootable?</summary><p>Tidak. ISO harus memiliki metode boot yang didukung. Mengganti nama file menjadi .iso tidak membuatnya bootable. Gunakan image dari sumber resmi dan periksa checksum yang disediakan pembuatnya.</p></details>
+    <details><summary>Mengapa harus dijalankan sebagai Administrator?</summary><p>Nawam memerlukan akses tingkat rendah untuk mengelola partisi dan sistem berkas USB. Izin ini tidak membuat setiap tindakan aman secara otomatis—pilihan drive tetap harus diperiksa.</p></details>
+    <details><summary>Bagaimana memakai mode portable?</summary><p>Letakkan file kosong bernama <code>nawam.ini</code> di direktori yang sama dengan <code>Nawam.exe</code>. Preferensi kemudian disimpan di direktori tersebut. Gunakan lokasi yang dapat ditulis.</p></details>
+    <details><summary>Kenapa tombol MULAI belum aktif?</summary><p>Periksa apakah perangkat USB terdeteksi, image sudah dipilih dan selesai dipindai, serta pengaturan sesuai. Log aplikasi membantu menjelaskan masalah tanpa mencoba format berulang kali.</p></details>
+    <details><summary>Mengapa Windows menampilkan Unknown publisher?</summary><p>Build awal belum memiliki tanda tangan Authenticode. Metadata SHANNA Digital Systems bukan sertifikat digital. Unduh hanya dari sumber yang Anda percaya dan cocokkan SHA-256. Jangan menonaktifkan perlindungan Windows secara menyeluruh.</p></details>
+    <details><summary>Apakah update otomatis sudah tersedia?</summary><p>Belum. Nawam tidak menawarkan executable aplikasi lain sebagai pembaruan. Sampai sistem update khusus Nawam tersedia, gunakan unduhan manual di halaman ini.</p></details>
+    <details><summary>Bagaimana melaporkan masalah?</summary><p>Simpan log aplikasi, versi Nawam, versi Windows, dan detail ISO yang digunakan. Jangan sertakan data pribadi atau isi drive. Informasi developer tersedia melalui <a href="https://shanna.id" rel="noopener">website SHANNA</a>.</p></details>
+  </div></section>
+  <section class="closing container"><p class="eyebrow">BUILT BY SHANNA DIGITAL SYSTEMS</p><h2>Mulai dari media<br>yang Anda siapkan sendiri.</h2><a class="button outline" href="#unduh">Dapatkan Nawam <span aria-hidden="true">↗</span></a></section>
+</main>
+<footer class="footer"><div class="container footer-main"><a class="brand" href="/" aria-label="Nawam beranda"><img src="/assets/nawam.svg" alt="" width="32" height="32"><span>nawam<span class="brand-dot">.</span></span></a><p>Bootable USB Creator.<br>Developed by SHANNA Digital Systems.</p><nav aria-label="Informasi website"><a href="/open-source.html">Lisensi & Open Source</a><a href="/privacy.html">Privasi</a><a href="https://shanna.id" rel="noopener">SHANNA ↗</a></nav></div><div class="container footer-bottom"><span>© 2026 SHANNA Digital Systems</span><span>Dirancang untuk Windows. Dibuat dengan tanggung jawab.</span></div></footer>
+</body>
+</html>

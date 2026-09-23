@@ -1,0 +1,9 @@
+node_modules/
+.firebase/
+firebase-debug.log*
+ui-debug.log
+*-debug.log
+artifacts/
+.env*
+!\.env.example
+*service-account*.json

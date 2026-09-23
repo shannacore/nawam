@@ -1,0 +1,140 @@
+{
+  "artifact": "D:\\ZDUMP\\MASTER WEB\\SHANNAPP\\SHANNA STUDIO DEV\\Nawam\\dist\\Nawam-1.0.0-x64.exe",
+  "sha256": "c076782cdabbd5ec9a73c6ddac497339c3819d763832325a9c1a67338399fa3d",
+  "bytes": 5016576,
+  "metadata": {
+    "Comments": "https://nawam.shanna.id",
+    "CompanyName": "SHANNA Digital Systems",
+    "FileDescription": "Nawam Bootable USB Creator",
+    "FileVersion": "1.0.0",
+    "InternalName": "Nawam",
+    "LegalCopyright": "Copyright \u00a9 2026 SHANNA Digital Systems; upstream \u00a9 2011-2026 Pete Batard (GPL v3+)",
+    "LegalTrademarks": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "OriginalFilename": "Nawam.exe",
+    "ProductName": "Nawam",
+    "ProductVersion": "1.0.0"
+  },
+  "embedded_text_bytes": {
+    "about_blurb_format": 204,
+    "legal_notice_format": 623,
+    "additional_copyrights": 4744,
+    "gplv3": 33091
+  },
+  "about": {
+    "title": "About Nawam",
+    "width": 319,
+    "height": 128,
+    "controls": [
+      {
+        "id": 1031,
+        "cls": 130,
+        "text": 120,
+        "style": 1342177283,
+        "x": 11,
+        "y": 8,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": 1033,
+        "cls": "RICHEDIT20W",
+        "text": "",
+        "style": 1342179332,
+        "x": 45,
+        "y": 7,
+        "width": 268,
+        "height": 89
+      },
+      {
+        "id": 1030,
+        "cls": 128,
+        "text": "License && Open Source",
+        "style": 1342373888,
+        "x": 45,
+        "y": 107,
+        "width": 126,
+        "height": 14
+      },
+      {
+        "id": 1,
+        "cls": 128,
+        "text": "OK",
+        "style": 1342373889,
+        "x": 253,
+        "y": 107,
+        "width": 50,
+        "height": 14
+      }
+    ]
+  },
+  "legal": {
+    "title": "Nawam - License & Open Source",
+    "width": 470,
+    "height": 382,
+    "controls": [
+      {
+        "id": 1033,
+        "cls": "RICHEDIT20W",
+        "text": "",
+        "style": 1344342084,
+        "x": 7,
+        "y": 7,
+        "width": 456,
+        "height": 104
+      },
+      {
+        "id": 4294967295,
+        "cls": 130,
+        "text": "Open-source components and credits",
+        "style": 1342308352,
+        "x": 7,
+        "y": 119,
+        "width": 456,
+        "height": 10
+      },
+      {
+        "id": 1032,
+        "cls": "RICHEDIT20W",
+        "text": "",
+        "style": 1344342084,
+        "x": 7,
+        "y": 132,
+        "width": 456,
+        "height": 82
+      },
+      {
+        "id": 4294967295,
+        "cls": 130,
+        "text": "GNU General Public License - Version 3",
+        "style": 1342308352,
+        "x": 7,
+        "y": 223,
+        "width": 456,
+        "height": 10
+      },
+      {
+        "id": 1034,
+        "cls": 129,
+        "text": "",
+        "style": 1352730628,
+        "x": 7,
+        "y": 236,
+        "width": 456,
+        "height": 115
+      },
+      {
+        "id": 2,
+        "cls": 128,
+        "text": "Close",
+        "style": 1342242817,
+        "x": 413,
+        "y": 362,
+        "width": 50,
+        "height": 14
+      }
+    ]
+  },
+  "pe_checks": "x64 Windows GUI, DEP, ASLR, DependentLoadFlags=0x800",
+  "live_ui": "Not verified: QA process is not elevated",
+  "canonical_publish": "Blocked: replacing dist/Nawam.exe returned WinError 5"
+}

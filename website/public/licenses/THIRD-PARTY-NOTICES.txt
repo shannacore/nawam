@@ -1,0 +1,258 @@
+Nawam is based on the open-source Rufus project.
+Copyright 2011-2026 Pete Batard and contributors.
+Nawam modifications: Copyright 2026 SHANNA Digital Systems.
+GPL-3.0-or-later. Complete component licenses remain in source.
+
+
+UI redesign concept by Fahad Al-Riyami
+
+Used with kind authorization
+
+
+
+Upstream Rufus icon by PC Unleashed (unused retained asset):
+
+Freeware
+
+
+
+Additional icons courtesy of Axialis Software:
+
+https://axialis.com/
+
+CC BY-ND 4.0, when used as native resolution bitmaps
+
+
+
+Boot record handling from ms-sys by Henrik Carlqvist:
+
+http://ms-sys.sourceforge.net/
+
+GNU General Public License (GPL) v2 or later
+
+
+
+FreeDOS support from the FreeDOS project:
+
+https://www.freedos.org/
+
+GNU General Public License (GPL) v2 or later, with binary redistribution allowed
+
+
+
+ISO extraction support from libcdio by Rocky Bernstein et al.:
+
+https://www.gnu.org/software/libcdio
+
+GNU General Public License (GPL) v3 or later
+
+
+
+WIM image manipulation support from wimlib by Carl Thijssen and Eric Biggers:
+
+https://wimlib.net
+
+GNU General Public License (GPL) v3 or later
+
+
+
+Syslinux support from Syslinux by H. Peter Anvin et al.:
+
+https://syslinux.org/
+
+GNU General Public License (GPL) v2 or later
+
+
+
+Grub4DOS support from Grub4DOS by chenall, itself based on GRUB Legacy by the Free Software Foundation:
+
+https://github.com/chenall/grub4dos
+
+GNU General Public License (GPL) v2 or later
+
+
+
+GRUB 2 support from GNU GRUB by the Free Software Foundation:
+
+https://www.gnu.org/software/grub
+
+GNU General Public License (GPL) v3 or later
+
+
+
+ReactOS support & additional FAT and time-conversion handling by ReactOS:
+
+https://www.reactos.org/
+
+https://svn.reactos.org/reactos/trunk
+
+GNU General Public License (GPL) v2 or later
+
+
+
+Bad blocks testing and ext2/ext3 formatting from e2fsprogs by Theodore Ts'o et al.:
+
+http://e2fsprogs.sourceforge.net/
+
+GNU General Public License (GPL) v3 compatible
+
+
+
+Large FAT32 volume formatting from fat32format by Tom Thornhill:
+
+http://www.ridgecrop.demon.co.uk/index.htm?fat32format.htm
+
+GNU General Public License (GPL) v2 or later
+
+
+
+XML parsing support from ezxml by Aaron Voisine:
+
+https://ezxml.sourceforge.net/
+
+MIT license
+
+
+
+fmifs.dll usage based on Formatx by Mark Russinovich:
+
+https://svn.reactos.org/reactos/trunk/reactos/dll/win32/fmifs
+
+Public Domain
+
+
+
+Device enumeration based on TestUSBDriveEject.cpp by ahmd:
+
+https://www.codeguru.com/forum/showthread.php?p=1951973
+
+Public Domain
+
+
+
+Handle search & process enumeration from System Informer by wj32 & dmex:
+
+https://systeminformer.sourceforge.io/
+
+GNU General Public License (GPL) v3 or later
+
+
+
+Decompression support from BusyBox/Bled:
+
+https://www.busybox.net/
+
+https://github.com/pbatard/bled
+
+GNU General Public License (GPL) v2 or later
+
+
+
+USB vs HDD and additional functions calls derived from smartmontools:
+
+https://sourceforge.net/projects/smartmontools
+
+GNU General Public License (GPL) v2 or later
+
+
+
+Partition and FS Type identification from GNU fdisk and GPT fdisk:
+
+https://www.gnu.org/software/fdisk
+
+https://www.rodsbooks.com/gdisk
+
+https://salsa.debian.org/debian/gdisk
+
+GNU General Public License (GPL) v2 or later
+
+
+
+Speed/ETA computation from GNU wget:
+
+https://www.gnu.org/software/wget
+
+GNU General Public License (GPL) v3 or later
+
+
+
+Additional bootloaders from KolibriOS:
+
+https://kolibrios.org/
+
+GNU General Public License (GPL) v2 or later
+
+
+
+MD5 digest functions by Ron Rivest, Colin Plumb et al.
+
+Public Domain
+
+
+
+SHA1 digest functions from GnuPG:
+
+https://www.gnupg.org/
+
+GNU General Public License (GPL) v3 or later
+
+
+
+SHA256 digest functions from 7-zip by Igor Pavlov and Crypto++ by Wei Dai:
+
+https://7-zip.org/
+
+https://github.com/weidai11/cryptopp/
+
+Public Domain
+
+
+
+SHA512 digest functions from libtomcrypt:
+
+https://github.com/libtom/libtomcrypt
+
+Public Domain
+
+
+
+PE256 digest functions from U-Boot:
+
+https://github.com/u-boot/u-boot
+
+GNU General Public License (GPL) v2 or later
+
+
+
+About and License dialogs inspired by WinSCP by Martin Prikryl
+
+https://winscp.net/
+
+GNU General Public License (GPL) v3 or later
+
+
+
+Check for Update dialog inspired by TortoiseSVN & TortoiseGit
+
+https://tortoisesvn.net/, https://tortoisegit.org/
+
+GNU General Public License (GPL) v2 or later
+
+
+
+Dark Mode support by ozone10
+
+https://github.com/ozone10
+
+
+
+Regular Expression parser from tiny-regex-c by Jim Huang (jserv):
+
+https://github.com/jserv/cregex
+
+BSD 2-Clause
+
+
+
+All other references can be found in the source.
+

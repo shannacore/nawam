@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+<title id="title">Nawam USB</title>
+<rect x="8" y="8" width="240" height="240" rx="52" fill="#070B14"/>
+<g transform="rotate(34 128 128)">
+<rect x="96" y="31" width="64" height="67" rx="8" fill="#D7E8E2"/>
+<path fill="#111A27" d="M108 44h12v20h-12zm28 0h12v20h-12z"/>
+<rect x="78" y="82" width="100" height="141" rx="25" fill="#10B981"/>
+<path d="M91 111v80c0 10 7 18 17 18" fill="none" stroke="#2EE6A6" stroke-width="6" stroke-linecap="round"/>
+<path d="M128 176v-52m0 26-18-16m18 25 18-15v-13" fill="none" stroke="#071C17" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="m128 111-10 15h20z" fill="#071C17"/>
+<circle cx="128" cy="181" r="8" fill="#071C17"/>
+<circle cx="109" cy="132" r="6" fill="#071C17"/>
+<rect x="140" y="119" width="13" height="13" rx="2" fill="#071C17"/>
+</g></svg>
