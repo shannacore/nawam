@@ -1,5 +1,11 @@
 # Nawam — change and verification report
 
+## 1.0.4 compact panel
+
+Removed the internal title/tagline header and its reserved vertical space. All
+40 native controls move up equally; widths, styles, order and callbacks remain.
+The window title and small application icon are unchanged.
+
 ## 1.0.3 simple-header update
 
 Removed the large logo from the painted main-panel header and aligned its text

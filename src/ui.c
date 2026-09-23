@@ -1601,8 +1601,8 @@ void SetBootTypeDropdownWidth(void)
 	SendMessage(hBootType, CB_SETDROPPEDWIDTH, (WPARAM)max(sz.cx + 10, rc.right - rc.left), (LPARAM)0);
 }
 
-// Create the horizontal section lines and Nawam's native, single-panel header.
-// Keep the measured layout above untouched: the resource reserves 38 dialog units.
+// Create the horizontal section lines for the single-panel layout.
+// Keep all measured native control spacing above untouched.
 static BOOL NawamHighContrast(void)
 {
 	HIGHCONTRASTW hc = { 0 };
@@ -1663,52 +1663,17 @@ BOOL NawamCheckMainWorkArea(HWND hDlg)
 
 void OnPaint(HDC hdc)
 {
-	RECT metrics = { 8, 5, 0, 38 }, client, header, text, section;
-	LOGFONTW lf = { 0 };
-	HFONT title_font = NULL, body_font;
+	RECT metrics = { 8, 0, 0, 0 }, section;
 	HBRUSH brush = (HBRUSH)GetStockObject(DC_BRUSH);
 	BOOL hc = NawamHighContrast();
 	COLORREF accent = hc ? GetSysColor(COLOR_HIGHLIGHT) :
 		(is_darkmode_enabled ? RGB(0x93, 0xC5, 0xFD) : RGB(0x25, 0x63, 0xEB));
-	COLORREF ink = hc ? GetSysColor(COLOR_WINDOWTEXT) :
-		(is_darkmode_enabled ? DARKMODE_NORMAL_TEXT_COLOR : RGB(0x0F, 0x17, 0x2A));
 	int saved = SaveDC(hdc), i, line_width;
 	if (saved == 0)
 		return;
 	MapDialogRect(hMainDialog, &metrics);
-	GetClientRect(hMainDialog, &client);
-	header = client;
-	header.bottom = metrics.bottom;
-	SetDCBrushColor(hdc, hc ? GetSysColor(COLOR_BTNFACE) :
-		(is_darkmode_enabled ? DARKMODE_NORMAL_CONTROL_BACKGROUND_COLOR : RGB(0xEF, 0xF6, 0xFF)));
-	FillRect(hdc, &header, brush);
-	// Keep the panel text-only; the standard window title bar retains its icon.
-	body_font = (HFONT)SendMessage(hMainDialog, WM_GETFONT, 0, 0);
-	if (body_font != NULL && GetObjectW(body_font, sizeof(lf), &lf)) {
-		lf.lfHeight = -MulDiv(20, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-		lf.lfWeight = FW_SEMIBOLD;
-		title_font = CreateFontIndirectW(&lf);
-	}
-	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, ink);
-	text = header;
-	text.left = metrics.left;
-	text.right -= metrics.left;
-	text.top = metrics.top;
-	if (title_font != NULL)
-		SelectObject(hdc, title_font);
-	DrawTextW(hdc, L"Nawam", -1, &text, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
-	if (body_font != NULL)
-		SelectObject(hdc, body_font);
-	text.top += MulDiv(24, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-	SetTextColor(hdc, hc ? ink : (is_darkmode_enabled ? DARKMODE_NORMAL_TEXT_COLOR : RGB(0x47, 0x55, 0x69)));
-	DrawTextW(hdc, L"Bootable USB Creator", -1, &text, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
 	line_width = max(1, MulDiv(2, GetDeviceCaps(hdc, LOGPIXELSY), 96));
-	header.top = header.bottom - line_width;
-	SetDCBrushColor(hdc, accent);
-	FillRect(hdc, &header, brush);
-	// Short blue rules replace the heavy black lines. Start AFTER the measured
-	// localized headings, never across their text or behind native controls.
+	// Start directly at Drive Properties; retain only section accents.
 	for (i = 0; i < ARRAYSIZE(section_control_ids); i++) {
 		GetWindowRect(GetDlgItem(hMainDialog, section_control_ids[i]), &section);
 		MapWindowPoints(NULL, hMainDialog, (POINT*)&section, 2);
@@ -1716,7 +1681,8 @@ void OnPaint(HDC hdc)
 		section.right = mw + fw;
 		section.top = section_vpos[i];
 		section.bottom = section.top + line_width;
-		SetDCBrushColor(hdc, hc ? accent : (is_darkmode_enabled ? DARKMODE_NORMAL_CONTROL_EDGE_COLOR : RGB(0xDB, 0xE7, 0xF5)));
+		SetDCBrushColor(hdc, hc ? accent : (is_darkmode_enabled ?
+			DARKMODE_NORMAL_CONTROL_EDGE_COLOR : RGB(0xDB, 0xE7, 0xF5)));
 		if (section.right > section.left) {
 			FillRect(hdc, &section, brush);
 			section.right = min(section.right, section.left + 3 * metrics.left);
@@ -1725,6 +1691,4 @@ void OnPaint(HDC hdc)
 		}
 	}
 	RestoreDC(hdc, saved);
-	if (title_font != NULL)
-		DeleteObject(title_font);
 }

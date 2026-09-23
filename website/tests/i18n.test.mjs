@@ -114,10 +114,10 @@ test('release metadata fails closed for invalid fields and foreign or mismatched
   const cases = [null, [], {}, {...release, available: 'true'}, {...release, architecture: 'arm64'},
     ...[0, -1, 1.1, '5037056', null, Number.MAX_SAFE_INTEGER + 1].map(bytes => ({...release, bytes})),
     ...['', 'a'.repeat(63), 'G'.repeat(64), release.sha256 + '\n', null, [release.sha256]].map(sha256 => ({...release, sha256})),
-    ...['9.9.9', '1.0.3\n', 101, null].map(version => ({...release, version})),
+    ...['9.9.9', '1.0.4\n', 101, null].map(version => ({...release, version})),
     ...[release.url.replace('github.com', 'github.com.evil.test'), release.url.replace('shannacore', 'other'),
       release.url.replace('/nawam/', '/another-repo/'), release.url.replace('https:', 'http:'),
-      release.url.replace('/v1.0.3/', '/v9.9.9/'), release.url + '?redirect=evil', release.url + '#fragment',
+      release.url.replace('/v1.0.4/', '/v9.9.9/'), release.url + '?redirect=evil', release.url + '#fragment',
       release.url.replace('github.com', 'user@github.com')].map(url => ({...release, url}))];
   for (const data of cases) {
     const state = await runSite({data});

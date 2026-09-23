@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM = ROOT.parent / "rufus-master"
-SHIFT = 38
+SHIFT = 0
 EXTRA_WIDTH = 40
 
 
@@ -28,7 +28,7 @@ def controls(dialog):
 
 
 class MainDesignTests(unittest.TestCase):
-    def test_reserved_header_preserves_every_native_control(self):
+    def test_no_header_preserves_every_native_control(self):
         self.assertTrue(UPSTREAM.is_dir(), "Immutable upstream sibling required for comparison")
         old = main_dialog(UPSTREAM / "src/rufus.rc")
         new = main_dialog(ROOT / "src/rufus.rc")
@@ -57,14 +57,15 @@ class MainDesignTests(unittest.TestCase):
         for name in ("src/format.c", "src/drive.c", "src/badblocks.c", "src/ui_data.h"):
             self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), manifest[name], name)
 
-    def test_header_is_text_only_and_titlebar_icon_is_retained(self):
+    def test_no_panel_title_tagline_or_logo_and_titlebar_icon_retained(self):
         source = (ROOT / "src/ui.c").read_text(encoding="utf-8-sig")
         paint = source.split("// Create the horizontal section lines", 1)[1]
-        self.assertIn('L"Nawam"', paint)
+        self.assertNotIn('L"Nawam"', paint)
+        self.assertNotIn('Bootable USB Creator', paint)
         self.assertNotIn('DrawIconEx', paint)
         self.assertNotIn('LoadImageW', paint)
         self.assertNotIn('HICON logo', paint)
-        self.assertIn('text.left = metrics.left;', paint)
+        self.assertNotIn('CreateFontIndirectW', paint)
         dialogs = (ROOT / 'src/stdlg.c').read_text(encoding='utf-8')
         self.assertIn('void SetTitleBarIcon(HWND hDlg)', dialogs)
         self.assertIn('MAKEINTRESOURCE(IDI_ICON)', dialogs)

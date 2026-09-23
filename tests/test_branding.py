@@ -22,14 +22,14 @@ class BrandingTests(unittest.TestCase):
             "InternalName": "Nawam",
             "OriginalFilename": "Nawam.exe",
             "CompanyName": "Shanna Studio",
-            "FileVersion": "1.0.3",
-            "ProductVersion": "1.0.3",
+            "FileVersion": "1.0.4",
+            "ProductVersion": "1.0.4",
             "Comments": "https://nawam.shanna.id",
         }.items():
             self.assertIn(f'VALUE "{field}", "{value}"', resource)
-        self.assertIn('CAPTION "Nawam 1.0.3"', resource)
-        self.assertIn("FILEVERSION 1,0,3,0", resource)
-        self.assertIn("PRODUCTVERSION 1,0,3,0", resource)
+        self.assertIn('CAPTION "Nawam 1.0.4"', resource)
+        self.assertIn("FILEVERSION 1,0,4,0", resource)
+        self.assertIn("PRODUCTVERSION 1,0,4,0", resource)
         self.assertIn('"../res/nawam.ico"', resource)
         self.assertNotRegex(resource, r'CAPTION "[^"]*Rufus')
         self.assertIn("Pete Batard", resource)

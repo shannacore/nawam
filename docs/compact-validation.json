@@ -1,10 +1,10 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "packer": "UPX 5.2.1",
-  "originalSha256": "5ceff81bc54b76cafd67e41c81fe38ab543adee131709ae42ffa3f8bf157a873",
-  "compressedSha256": "e0d87aa85c3611c9b91c9101438dcca93f9d6d135657aebb4ab19981ea3d87b6",
-  "originalBytes": 5079552,
-  "compressedBytes": 1879040,
+  "originalSha256": "e91e1eab5f967f540f94c45de5a75972290f5fe1633d84eb71be67f3b460aedb",
+  "compressedSha256": "dd8565915861a0e90edab1b97b45876b1b89a42511ee8fbf8928065b0746d5a6",
+  "originalBytes": 5079040,
+  "compressedBytes": 1880064,
   "checkedSections": [
     ".text",
     ".data",

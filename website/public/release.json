@@ -1,12 +1,12 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "available": true,
   "architecture": "x64",
-  "url": "https://github.com/shannacore/nawam/releases/download/v1.0.3/Nawam.exe",
-  "sha256": "e0d87aa85c3611c9b91c9101438dcca93f9d6d135657aebb4ab19981ea3d87b6",
-  "bytes": 1879040,
-  "sourceUrl": "https://github.com/shannacore/nawam/releases/download/v1.0.3/Nawam-1.0.3-source.zip",
-  "sourceSha256": "8f0bae13669d2e4208bfcc25bea64a825b81793e81840422b5351df0b8552eff",
+  "url": "https://github.com/shannacore/nawam/releases/download/v1.0.4/Nawam.exe",
+  "sha256": "dd8565915861a0e90edab1b97b45876b1b89a42511ee8fbf8928065b0746d5a6",
+  "bytes": 1880064,
+  "sourceUrl": "https://github.com/shannacore/nawam/releases/download/v1.0.4/Nawam-1.0.4-source.zip",
+  "sourceSha256": "a9667cfbf4ff976617c22b045b8fd6d04f4835d6880d67609e15026086d1af88",
   "sourceFiles": 849,
   "signed": false
 }

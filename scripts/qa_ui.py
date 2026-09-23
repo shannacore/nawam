@@ -101,7 +101,7 @@ def children(handle):
 if not C.windll.shell32.IsUserAnAdmin():
     raise SystemExit("QA requires user-approved elevation to inspect the elevated application.")
 all_windows = windows()
-main = next((w for w in all_windows if w["title"].startswith("Nawam 1.0.3")), None)
+main = next((w for w in all_windows if w["title"].startswith("Nawam 1.0.4")), None)
 if not main:
     raise SystemExit("Exact dist/Nawam.exe main window not found")
 handle = main["hwnd"]
