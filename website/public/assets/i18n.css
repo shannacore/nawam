@@ -1,0 +1,13 @@
+/* Shared language controls; existing Indonesian content styles are retained. */
+html{scroll-padding-top:150px}
+.language-row{display:flex;justify-content:flex-end;padding-bottom:8px}
+.language-switch{display:flex;align-items:center;gap:6px;font-size:14px;line-height:1.4}
+.language-switch a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 14px;border:1px solid var(--border);border-radius:6px;color:var(--muted)}
+.language-switch a[aria-current="page"]{border-color:var(--mint);color:var(--accent);background:var(--surface)}
+.language-switch a:hover{color:var(--text);border-color:var(--mint)}
+.download-section{scroll-margin-top:0}
+@media(max-width:780px){
+  .header #navigation{top:100%}
+  .language-row{justify-content:flex-start}
+  .language-switch{font-size:14px}
+}

@@ -56,6 +56,18 @@ Primary site: https://nawam.web.app. No custom DNS configuration is needed.
 The previous `nawam-shanna` Hosting site is disabled after new-site verification.
 The Firebase PROJECT remains `nawam-shanna`; the active Hosting SITE is `nawam`.
 
+## Light design and languages
+
+The website uses the owner's light palette: white navigation/cards, #F8FAFC
+background, #0F172A headings, #2563EB primary buttons, #1D4ED8 hover, and #06B6D4
+accents. The ORIGINAL mint USB logo is retained unchanged; web colors do not
+rebrand the Windows application. `assets/design.css` replaces the legacy theme.
+
+Indonesian: `/`. English: `/en/`. Each of the five static pages has a paired
+language link and hreflang metadata. Language switching preserves section links.
+Run `node scripts/browser-i18n-check.mjs` for all 40 page/viewport checks.
+Existing release1.0.1 downloads stay unchanged during the website-only redesign.
+
 ## Editing
 
 - `public/index.html`: all main content, FAQ and compatibility copy.
