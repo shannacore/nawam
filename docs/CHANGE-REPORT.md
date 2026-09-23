@@ -1,5 +1,20 @@
 # Nawam — change and verification report
 
+## 1.0.2 safety and single-panel design update
+
+Main window has a native Nawam header with the original USB logo, a wider
+single-panel layout, and blue accents. All main control identities, sequence
+and operation states remain. Native theme/high-contrast handling is preserved.
+
+Added validated manual security-only refresh, owned consent/result dialogs,
+main-command gating, and media refresh on gate release. Bounded network reads,
+atomic DBX caching, clear unsigned-build notice, clickable boot help and
+monitor-fitted license layout are regression-tested. Build provenance and
+compression validation are mandatory. Full physical media/boot certification
+is not claimed; the release remains a prerelease. See RELEASE-NOTES.md.
+Solution/project display filenames are Nawam.sln and .vs/Nawam.vcxproj.
+Original source attribution and sensitive internal boot identifiers are retained.
+
 ## 1.0.1 identity update
 
 Executable publisher/CompanyName is now Shanna Studio. About has copyright only,

@@ -1,10 +1,8 @@
 """Verify the staged PE without executing application code or touching drives."""
 from pathlib import Path
 import ast
-import hashlib
 import json
 import re
-import shutil
 import struct
 import sys
 
@@ -15,27 +13,21 @@ import pefile
 source = ROOT / "dist/Nawam.build.exe"
 if not source.is_file():
     source = ROOT / "dist/Nawam.exe"
+from release_support import require, sha256, validate_pe, verify_provenance
+
 data = source.read_bytes()
+metadata = validate_pe(ROOT, data)
+provenance_path = (ROOT / 'dist/Nawam.build.provenance.json'
+                   if source.name == 'Nawam.build.exe' else ROOT / 'docs/build-provenance.json')
+verify_provenance(ROOT, data, provenance_path)
 pe = pefile.PE(data=data)
-assert pe.FILE_HEADER.Machine == 0x8664
-assert pe.OPTIONAL_HEADER.Subsystem == 2
-assert pe.OPTIONAL_HEADER.DllCharacteristics & 0x140 == 0x140
-assert pe.DIRECTORY_ENTRY_LOAD_CONFIG.struct.DependentLoadFlags == 0x800
-metadata = {k.decode(): v.decode() for group in pe.FileInfo for item in group
-            if hasattr(item, "StringTable") for table in item.StringTable
-            for k, v in table.entries.items()}
-assert metadata["ProductName"] == "Nawam"
-assert metadata["FileVersion"] == "1.0.1"
-assert metadata["OriginalFilename"] == "Nawam.exe"
-assert metadata["CompanyName"] == "Shanna Studio"
-assert metadata["Comments"] == "https://nawam.shanna.id"
 header = (ROOT / "src/license.h").read_text(encoding="utf-8")
 constants = {}
 for name in ("about_blurb_format", "legal_notice_format", "additional_copyrights", "gplv3"):
     body = header.split("const char* " + name + " =", 1)[1]
     strings = re.match(r'\s*((?:"(?:[^"\\]|\\.)*"\s*)+);', body)[1]
     text = "".join(ast.literal_eval(m[0]) for m in re.finditer(r'"(?:[^"\\]|\\.)*"', strings))
-    assert text.encode("utf-8") in data, name + " missing or truncated in PE"
+    require(text.encode("utf-8") in data, name + " missing or truncated in PE")
     constants[name] = len(text.encode("utf-8"))
 
 
@@ -46,7 +38,7 @@ def dialog(resource_id):
     raw = pe.get_data(leaf.OffsetToData, leaf.Size)
     offset = 26
     version, signature, _, _, style, count, x, y, width, height = struct.unpack_from("<HHIIIHhhhh", raw)
-    assert (version, signature) == (1, 65535)
+    require((version, signature) == (1, 65535), 'Expected extended dialog resource')
 
     def word_string():
         nonlocal offset
@@ -83,18 +75,20 @@ def dialog(resource_id):
 
 
 about, legal = dialog(102), dialog(105)
-assert about["height"] == 128 and legal["height"] == 382
-assert 1032 not in {c["id"] for c in about["controls"]}
-assert next(c for c in about["controls"] if c["id"] == 1030)["text"] == "License && Open Source"
-assert legal["title"] == "Nawam - License & Open Source"
-assert sum(bool(c["style"] & 0x200000) for c in legal["controls"]) == 3
-assert {1032, 1033}.issubset({c["id"] for c in legal["controls"]})
+require(about["height"] == 128 and legal["height"] == 382, 'Unexpected About/legal dimensions')
+require(1032 not in {c["id"] for c in about["controls"]}, 'Credits must be in legal dialog')
+require(next(c for c in about["controls"] if c["id"] == 1030)["text"] == "License && Open Source",
+        'Missing legal dialog button')
+require(legal["title"] == "Nawam - License & Open Source", 'Unexpected legal title')
+require(sum(bool(c["style"] & 0x200000) for c in legal["controls"]) == 3, 'Missing legal scrollbars')
+require({1032, 1033}.issubset({c["id"] for c in legal["controls"]}), 'Missing legal controls')
 pe.close()
-digest = hashlib.sha256(data).hexdigest()
-output = ROOT / "dist/Nawam-1.0.1-x64.exe"
-if not output.exists() or hashlib.sha256(output.read_bytes()).hexdigest() != digest:
-    shutil.copy2(source, output)
-assert hashlib.sha256(output.read_bytes()).hexdigest() == digest
+digest = sha256(data)
+output = ROOT / f"dist/Nawam-{metadata['FileVersion']}-x64.exe"
+verify_provenance(ROOT, data, provenance_path)
+if not output.exists() or sha256(output.read_bytes()) != digest:
+    output.write_bytes(data)
+require(sha256(output.read_bytes()) == digest, 'Versioned executable SHA256 mismatch')
 (output.with_suffix(".exe.sha256")).write_text(digest + "  " + output.name + "\n", encoding="ascii")
 report = dict(artifact=str(output), sha256=digest, bytes=len(data), metadata=metadata,
               embedded_text_bytes=constants, about=about, legal=legal,

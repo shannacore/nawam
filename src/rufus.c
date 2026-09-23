@@ -66,7 +66,6 @@ enum bootcheck_return {
 };
 
 static const char* cmdline_hogger = ".\\nawam.com";
-static const char* vs_reg = "Software\\Microsoft\\VisualStudio";
 static const char* arch_name[ARCH_MAX] = {
 	"unknown", "x86_32", "x86_64", "ARM", "ARM64", "IA64", "RISC-V 64", "LoongArch 64", "EBC" };
 static BOOL existing_key = FALSE;	// For LGP set/restore
@@ -99,7 +98,6 @@ extern uint8_t* grub2_buf;
 extern long grub2_len;
 extern char* szStatusMessage;
 extern const char* old_c32_name[NB_OLD_C32];
-extern const char* cert_name[3];
 extern const char* FileSystemLabel[FS_MAX];
 extern const char *bootmgr_efi_name, *efi_dirname, *efi_bootname[ARCH_MAX];
 
@@ -2263,6 +2261,7 @@ static void InitDialog(HWND hDlg)
 	if (!advanced_mode_format)
 		ToggleAdvancedFormatOptions(FALSE);
 	ToggleImageOptions();
+	NawamCheckMainWorkArea(hDlg);
 
 	// Process commandline parameters
 	if (img_provided) {
@@ -2312,6 +2311,9 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 	wchar_t* wbuffer = NULL;
 	loc_cmd* lcmd = NULL;
 
+	if (security_refresh_active && (message == WM_COMMAND || message == WM_CLOSE ||
+		message == WM_DROPFILES || message == UM_SELECT_ISO || message == UM_FORMAT_START))
+		return (INT_PTR)TRUE;
 	switch (message) {
 
 	case WM_COMMAND:
@@ -2399,6 +2401,11 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 			DestroyWindow(hLogDialog);
 			GetWindowRect(hDlg, &relaunch_rc);
 			DestroyWindow(hDlg);
+			break;
+		case IDS_CSM_HELP_TXT:
+			if (HIWORD(wParam) == STN_CLICKED)
+				Notification(MB_OK | MB_ICONINFORMATION, lmprintf(MSG_048),
+					lmprintf((target_type == TT_UEFI) ? MSG_152 : MSG_151));
 			break;
 		case IDC_ABOUT:
 			CreateAboutBox();
@@ -2850,11 +2857,8 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 		fScale = GetDeviceCaps(hDC, LOGPIXELSX) / 96.0f;
 		safe_release_dc(hDlg, hDC);
 		apply_localization(IDD_DIALOG, hDlg);
-		// The AppStore version always enables Fido
-		if (appstore_version)
-			SetFidoCheck();
-		else
-			SetUpdateCheck();
+		// Nawam has no automatic network opt-in, including Store-marker mode.
+		SetUpdateCheck();
 		first_log_display = TRUE;
 		log_displayed = FALSE;
 		hLogDialog = MyCreateDialog(hMainInstance, IDD_LOG, hDlg, (DLGPROC)LogCallback);
@@ -2930,7 +2934,14 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 		EndPaint(hDlg, &ps);
 		break;
 
+	case WM_CTLCOLORDLG:
+		return (INT_PTR)NawamMainControlBrush((HDC)wParam, NULL);
+
 	case WM_CTLCOLORSTATIC:
+		{
+			HBRUSH brush = NawamMainControlBrush((HDC)wParam, (HWND)lParam);
+			if (brush != NULL) return (INT_PTR)brush;
+		}
 		if ((HWND)lParam != GetDlgItem(hDlg, IDS_CSM_HELP_TXT))
 			return FALSE;
 		SetBkMode((HDC)wParam, TRANSPARENT);
@@ -3361,7 +3372,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	uint32_t wue_options;
 	FILE* fd;
 	BOOL attached_console = FALSE, external_loc_file = FALSE, ndta_set = FALSE, automount = TRUE;
-	BOOL disable_hogger = FALSE, previous_enable_HDDs = FALSE, vc = IsRegistryNode(REGKEY_HKCU, vs_reg);
+	BOOL disable_hogger = FALSE, previous_enable_HDDs = FALSE;
+	BOOL startup_notice_accepted = FALSE;
 	BOOL alt_pressed = FALSE, alt_command = FALSE;
 	BYTE *loc_data;
 	DWORD loc_size, u = 0, size = sizeof(u);
@@ -3649,19 +3661,6 @@ skip_args_processing:
 	// Look for a .ini file in the current app directory
 	static_sprintf(ini_path, "%snawam.ini", app_dir);
 	fd = fopenU(ini_path, ini_flags);	// Will create the file if portable mode is requested
-#if !defined(ALPHA)
-	// Using the string directly in safe_strcmp() would call GetSignatureName() twice
-	tmp = GetSignatureName(NULL, NULL, NULL, FALSE);
-	vc |= (safe_strcmp(tmp, cert_name[0]) == 0);
-#else
-	// So as not to multiply user prompts, as well as officialize our own GitHub builds,
-	// we sign ALPHAs using disposable (non Authenticode) self-signed credentials.
-	static const uint8_t github_thumbprint[SHA1_HASHSIZE] =
-	{ 0xc9, 0x00, 0x1c, 0x67, 0x25, 0x16, 0x83, 0x2b, 0x1a, 0x61, 0xf4, 0x5f, 0x1a, 0x26, 0xd5, 0x76, 0xda, 0xab, 0x06, 0xdf };
-	uint8_t thumbprint[SHA1_HASHSIZE] = { 0 };
-	tmp = GetSignatureName(NULL, NULL, thumbprint, FALSE);
-	vc |= (safe_strcmp(tmp, "Rufus - GitHub Official Build") == 0) && (memcmp(thumbprint, github_thumbprint, SHA1_HASHSIZE) == 0);
-#endif
 	if (fd != NULL) {
 		ini_file = ini_path;
 		// In portable mode, use the app directory for all local storage
@@ -3805,7 +3804,8 @@ skip_args_processing:
 		get_loc_data_file(loc_file, selected_locale);
 		right_to_left_mode = ((selected_locale->ctrl_id) & LOC_RIGHT_TO_LEFT);
 		// Set MB_SYSTEMMODAL to prevent Far Manager from stealing focus...
-		MessageBoxExU(NULL, lmprintf(MSG_002), lmprintf(MSG_001),
+		MessageBoxExU(NULL, (PRIMARYLANGID(selected_langid) == LANG_INDONESIAN) ?
+			NAWAM_MUTEX_NOTICE_ID : NAWAM_MUTEX_NOTICE_EN, lmprintf(MSG_001),
 			MB_ICONERROR | MB_IS_RTL | MB_SYSTEMMODAL, selected_langid);
 		goto out;
 	}
@@ -3861,11 +3861,16 @@ relaunch:
 	if (get_loc_data_file(loc_file, selected_locale))
 		WriteSettingStr(SETTING_LOCALE, selected_locale->txt[0]);
 
-	if (!vc) {
-		if (MessageBoxExU(NULL, lmprintf(MSG_296), lmprintf(MSG_295),
-			MB_YESNO | MB_ICONWARNING | MB_IS_RTL | MB_SYSTEMMODAL, selected_langid) != IDYES)
+	// This unsigned distribution has no publisher trust assertion. Acceptance is
+	// process-local, including locale relaunches, and never changes PKI validation.
+	if (!startup_notice_accepted) {
+		// Other selected languages use the explicit English fallback.
+		BOOL indonesian = (PRIMARYLANGID(selected_langid) == LANG_INDONESIAN);
+		if (MessageBoxExU(NULL, indonesian ? NAWAM_STARTUP_NOTICE_ID : NAWAM_STARTUP_NOTICE_EN,
+			indonesian ? NAWAM_STARTUP_TITLE_ID : NAWAM_STARTUP_TITLE_EN,
+			MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING | MB_IS_RTL | MB_SYSTEMMODAL, selected_langid) != IDYES)
 			goto out;
-		vc = TRUE;
+		startup_notice_accepted = TRUE;
 	}
 
 	/*

@@ -116,3 +116,8 @@ extern void ShowLanguageMenu(RECT rcExclude);
 extern void SetPassesTooltip(void);
 extern void SetBootTypeDropdownWidth(void);
 extern void OnPaint(HDC hdc);
+// Native Nawam main-dialog presentation; neither helper changes control state.
+// NULL brush preserves the existing dark/high-contrast/control-specific handler.
+extern HBRUSH NawamMainControlBrush(HDC hdc, HWND hCtrl);
+// Call after all initial layout toggles; FALSE means current window cannot fit.
+extern BOOL NawamCheckMainWorkArea(HWND hDlg);

@@ -12,7 +12,7 @@ test('landing page is complete and honest about availability', () => {
     assert.ok(html.includes(`id="${id}"`), id);
   }
   assert.match(html, /lang="id"/);
-  assert.match(html, /nawam\.web\.app/);
+  assert.match(html, /nawam\.shanna\.id/);
   assert.match(html, /SHANNA Digital Systems/);
   assert.match(html, /data.*USB.*(terhapus|dihapus)/i);
   assert.match(html, /belum.*(digital|code.signing)/i);

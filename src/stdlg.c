@@ -43,6 +43,7 @@
 #include "registry.h"
 #include "settings.h"
 #include "license.h"
+#include "nawam_layout.h"
 #include "darkmode.h"
 
 /* Globals */
@@ -363,6 +364,72 @@ static void OpenDialogLink(HWND hDlg, LPARAM lParam)
 	ShellExecuteW(hDlg, L"open", url, NULL, NULL, SW_SHOWNORMAL);
 }
 
+/* Fit measured, already-localized controls to this monitor, not the desktop.
+ * Preserve the tab order and font sizes; the three text panes remain scrollable.
+ */
+static void FitLicenseDialog(HWND hDlg)
+{
+	MONITORINFO monitor = { 0 };
+	RECT rc, client;
+	NawamLayoutRect work, window, controls[6], swap;
+	HWND child, handles[6] = { NULL }, swap_handle;
+	int i, label = 1, frame_width, frame_height;
+	LONG_PTR style;
+
+	monitor.cbSize = sizeof(monitor);
+	if (!GetMonitorInfo(MonitorFromWindow(hDlg, MONITOR_DEFAULTTONEAREST), &monitor))
+		return;
+	if (!GetWindowRect(hDlg, &rc) || !GetClientRect(hDlg, &client))
+		return;
+	window.x = rc.left;
+	window.y = rc.top;
+	window.width = rc.right - rc.left;
+	window.height = rc.bottom - rc.top;
+	frame_width = window.width - (client.right - client.left);
+	frame_height = window.height - (client.bottom - client.top);
+	work.x = monitor.rcWork.left;
+	work.y = monitor.rcWork.top;
+	work.width = monitor.rcWork.right - monitor.rcWork.left;
+	work.height = monitor.rcWork.bottom - monitor.rcWork.top;
+	handles[0] = GetDlgItem(hDlg, IDC_ABOUT_BLURB);
+	handles[2] = GetDlgItem(hDlg, IDC_ABOUT_COPYRIGHTS);
+	handles[4] = GetDlgItem(hDlg, IDC_LICENSE_TEXT);
+	handles[5] = GetDlgItem(hDlg, IDCANCEL);
+	// Both headings use IDC_STATIC, so enumerate rather than GetDlgItem.
+	for (child = GetWindow(hDlg, GW_CHILD); child != NULL; child = GetWindow(child, GW_HWNDNEXT)) {
+		if (GetDlgCtrlID(child) == -1 && label <= 3) {
+			handles[label] = child;
+			label += 2;
+		}
+	}
+	for (i = 0; i < 6; i++) {
+		if (handles[i] == NULL || !GetWindowRect(handles[i], &rc))
+			return;
+		MapWindowPoints(NULL, hDlg, (POINT*)&rc, 2);
+		controls[i].x = rc.left;
+		controls[i].y = rc.top;
+		controls[i].width = rc.right - rc.left;
+		controls[i].height = rc.bottom - rc.top;
+	}
+	if (controls[1].y > controls[3].y) {
+		swap = controls[1]; controls[1] = controls[3]; controls[3] = swap;
+		swap_handle = handles[1]; handles[1] = handles[3]; handles[3] = swap_handle;
+	}
+	if (!NawamFitLicenseLayout(&work, &window, frame_width, frame_height, controls))
+		return;
+	SetWindowPos(hDlg, NULL, window.x, window.y, window.width, window.height,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	for (i = 0; i < 6; i++) {
+		if (i == 0 || i == 2 || i == 4) {
+			style = GetWindowLongPtr(handles[i], GWL_STYLE);
+			SetWindowLongPtr(handles[i], GWL_STYLE, style | WS_TABSTOP | WS_VSCROLL);
+		}
+		SetWindowPos(handles[i], NULL, controls[i].x, controls[i].y,
+			controls[i].width, controls[i].height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+	}
+	SendMessage(hDlg, WM_NEXTDLGCTL, (WPARAM)handles[5], TRUE);
+}
+
 INT_PTR CALLBACK LicenseCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LONG_PTR style;
@@ -400,6 +467,7 @@ INT_PTR CALLBACK LicenseCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 			SendMessage(hEdit, EM_SETSEL, 0, 0);
 		}
 		SetDarkModeForChild(hDlg);
+		FitLicenseDialog(hDlg);
 		break;
 	case WM_NOTIFY:
 		if (((LPNMHDR)lParam)->code == EN_LINK)
@@ -1573,6 +1641,67 @@ static void PositionControls(HWND hDlg)
 	SetWindowPos(hCtrl, hPrevCtrl, rc.left, rc.top, rc.right - rc.left, ddbh, 0);
 }
 
+/* Manual security refresh owns the modal dialog until its worker exits. */
+BOOL security_refresh_active = FALSE;
+static void RunSecurityRefresh(HWND hDlg)
+{
+	HANDLE worker;
+	DWORD result = 0, saved_error;
+	HCURSOR previous_cursor;
+	BOOL indonesian = PRIMARYLANGID(selected_langid) == LANG_INDONESIAN;
+	BOOL main_was_enabled;
+
+	if (security_refresh_active || op_in_progress || image_path != NULL || !IsWindow(hDlg)) {
+		uprintf("Security refresh requires an idle application with no selected image");
+		return;
+	}
+	// Acquire ownership BEFORE entering any nested modal message loop.
+	security_refresh_active = TRUE;
+	op_in_progress = TRUE;
+	saved_error = ErrorStatus;
+	main_was_enabled = IsWindowEnabled(hMainDialog);
+	EnableWindow(hMainDialog, FALSE);
+	EnableWindow(hDlg, FALSE);
+	if (MessageBoxExU(hDlg,
+		indonesian ? "Unduh data pemeriksaan Secure Boot dari sumber data tepercaya melalui HTTPS?\n\n"
+		"Ini bukan update EXE atau firmware dan tidak menulis ke USB. Periksa log untuk hasil setiap sumber."
+		: "Retrieve Secure Boot check data from trusted data sources over HTTPS?\n\n"
+		"This does not update the EXE or firmware, and does not write to USB. Check the log for each source result.",
+		"Nawam", MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2 | MB_IS_RTL, selected_langid) != IDYES)
+		goto cleanup;
+	if (!IsWindow(hDlg) || !op_in_progress || image_path != NULL)
+		goto cleanup;
+	previous_cursor = SetCursor(LoadCursor(NULL, IDC_WAIT));
+	worker = CreateThread(NULL, 0, NawamSecurityRefreshThread, NULL, 0, NULL);
+	if (worker != NULL) {
+		// Keep ownership until the worker has finished using its data and controls.
+		while (WaitForSingleObjectWithMessages(worker, INFINITE) != WAIT_OBJECT_0) { }
+		IGNORE_RETVAL(GetExitCodeThread(worker, &result));
+		CloseHandle(worker);
+	} else {
+		uprintf("Could not start security data refresh: %s", WindowsErrorString());
+	}
+	SetCursor(previous_cursor);
+	// Keep both windows and the gate owned through the final result dialog too.
+	MessageBoxExU(hDlg,
+		(result == 2) ? (indonesian ? "Data keamanan berhasil diperbarui. Lihat log untuk detail."
+		: "Security data refreshed. See the log for details.") :
+		(result == 1) ? (indonesian ? "Refresh selesai sebagian. Beberapa sumber gagal atau tidak tersedia. Lihat log."
+		: "Refresh partially completed. Some sources failed or were unavailable. See the log.") :
+		(indonesian ? "Refresh gagal. Tidak semua data berhasil diperbarui. Periksa log sebelum melanjutkan."
+		: "Refresh failed. Not all data could be updated. Review the log before continuing."),
+		"Nawam", MB_OK | ((result == 2) ? MB_ICONINFORMATION : MB_ICONWARNING) | MB_IS_RTL,
+		selected_langid);
+cleanup:
+	ErrorStatus = saved_error;
+	op_in_progress = FALSE;
+	security_refresh_active = FALSE;
+	if (IsWindow(hDlg)) EnableWindow(hDlg, TRUE);
+	EnableWindow(hMainDialog, main_was_enabled);
+	// Drain insertion/removal events suppressed while the refresh gate was owned.
+	PostMessage(hMainDialog, UM_MEDIA_CHANGE, 0, 0);
+}
+
 /*
  * Update policy and settings dialog callback
  */
@@ -1587,6 +1716,8 @@ INT_PTR CALLBACK UpdateCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 	int32_t freq;
 	char update_policy_text[4096];
 
+	if (security_refresh_active && (message == WM_CLOSE || message == WM_COMMAND))
+		return (INT_PTR)TRUE;
 	switch (message) {
 	case WM_INITDIALOG:
 		SetDarkModeForDlg(hDlg);
@@ -1632,19 +1763,24 @@ INT_PTR CALLBACK UpdateCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			lmprintf(MSG_180|MSG_RTF), lmprintf(MSG_181|MSG_RTF), lmprintf(MSG_182|MSG_RTF), lmprintf(MSG_183|MSG_RTF),
 			lmprintf(MSG_184|MSG_RTF), lmprintf(MSG_185|MSG_RTF), lmprintf(MSG_186|MSG_RTF));
 #if !NAWAM_SELF_UPDATE_ENABLED
-		SetWindowTextU(hDlg, "Nawam - Updates disabled");
+		SetWindowTextU(hDlg, "Nawam - Updates and security data");
 		static_strcpy(update_policy_text, "{\\rtf1\\ansi\\fs18 "
 			"\\b Nawam application updates are disabled.\\b0\\line\\line "
 			"No Nawam update server is configured. This build will not check for, "
-			"download, or install Rufus releases.\\line\\line "
+			"download, or install releases from another application.\\line\\line "
 			"Get Nawam information at " NAWAM_WEBSITE "\\line\\line "
 			"Select an existing ISO with SELECT. Optional upstream boot components "
-			"may still be downloaded when required, with their original verification.}");
+			"may still be downloaded when required, with their original verification.\\line\\line "
+			"\\b Refresh security data\\b0: use Refresh to retrieve current SBAT and "
+			"certificate revocations and DBX data from trusted sources. This is "
+			"a separate, manual action with confirmation, not an application update.}");
 		IGNORE_RETVAL(ComboBox_SetCurSel(hFrequency, 0));
 		IGNORE_RETVAL(ComboBox_SetCurSel(hBeta, 1));
 		EnableWindow(hFrequency, FALSE);
 		EnableWindow(hBeta, FALSE);
-		EnableWindow(GetDlgItem(hDlg, IDC_CHECK_NOW), FALSE);
+		SetDlgItemTextU(hDlg, IDS_CHECK_NOW_GRP, "Security data");
+		SetDlgItemTextU(hDlg, IDC_CHECK_NOW, "Refresh");
+		EnableWindow(GetDlgItem(hDlg, IDC_CHECK_NOW), !op_in_progress && image_path == NULL);
 #endif
 		SendMessageA(hPolicy, EM_SETTEXTEX, (WPARAM)&friggin_microsoft_unicode_amateurs, (LPARAM)update_policy_text);
 		SendMessage(hPolicy, EM_SETSEL, -1, -1);
@@ -1654,6 +1790,8 @@ INT_PTR CALLBACK UpdateCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 		SetDarkModeForChild(hDlg);
 		break;
 	case WM_NOTIFY:
+		if (((LPNMHDR)lParam)->code == EN_LINK)
+			OpenDialogLink(hDlg, lParam);
 		if ((((LPNMHDR)lParam)->code == EN_REQUESTRESIZE) && (!resized_already)) {
 			resized_already = TRUE;
 			hPolicy = GetDlgItem(hDlg, IDC_POLICY);
@@ -1675,7 +1813,11 @@ INT_PTR CALLBACK UpdateCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
 		case IDC_CHECK_NOW:
+#if !NAWAM_SELF_UPDATE_ENABLED
+			RunSecurityRefresh(hDlg);
+#else
 			CheckForUpdates(TRUE);
+#endif
 			return (INT_PTR)TRUE;
 		case IDC_UPDATE_FREQUENCY:
 			if (HIWORD(wParam) != CBN_SELCHANGE)

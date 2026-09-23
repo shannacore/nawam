@@ -66,12 +66,12 @@ function validRelease(release) {
   if (!Number.isSafeInteger(release.bytes) || release.bytes <= 0) return false;
   if (typeof release.version !== 'string' || !/^[0-9]+\.[0-9]+\.[0-9]+$/.test(release.version)) return false;
   // Keep this audited release pin in step with the static download links when publishing.
-  const approvedURL = 'https://github.com/shannacore/nawam-releases/releases/download/v1.0.1/Nawam.exe';
+  const approvedURL = 'https://github.com/shannacore/nawam/releases/download/v1.0.2/Nawam.exe';
   if (typeof release.url !== 'string' || release.url !== approvedURL) return false;
   const url = new URL(release.url);
   return url.protocol === 'https:' && url.host === 'github.com' &&
     !url.username && !url.password && !url.search && !url.hash &&
-    url.pathname === `/shannacore/nawam-releases/releases/download/v${release.version}/Nawam.exe`;
+    url.pathname === `/shannacore/nawam/releases/download/v${release.version}/Nawam.exe`;
 }
 async function loadRelease() {
   const button = document.getElementById('download-button');

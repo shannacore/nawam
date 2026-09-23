@@ -1601,17 +1601,138 @@ void SetBootTypeDropdownWidth(void)
 	SendMessage(hBootType, CB_SETDROPPEDWIDTH, (WPARAM)max(sz.cx + 10, rc.right - rc.left), (LPARAM)0);
 }
 
-// Create the horizontal section lines
+// Create the horizontal section lines and Nawam's native, single-panel header.
+// Keep the measured layout above untouched: the resource reserves 38 dialog units.
+static BOOL NawamHighContrast(void)
+{
+	HIGHCONTRASTW hc = { 0 };
+	hc.cbSize = sizeof(hc);
+	return SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(hc), &hc, 0) &&
+		(hc.dwFlags & HCF_HIGHCONTRASTON);
+}
+
+// Optional WM_CTLCOLORDLG / WM_CTLCOLORSTATIC hook. NULL means retain the
+// existing theme handler. Stock DC_BRUSH needs no allocation or cleanup.
+HBRUSH NawamMainControlBrush(HDC hdc, HWND hCtrl)
+{
+	wchar_t class_name[32];
+	int id;
+	if (is_darkmode_enabled || NawamHighContrast())
+		return NULL;
+	if (hCtrl != NULL) {
+		GetClassNameW(hCtrl, class_name, ARRAYSIZE(class_name));
+		if (lstrcmpiW(class_name, L"Static") != 0)
+			return NULL;
+		id = GetDlgCtrlID(hCtrl);
+		if (id == IDS_CSM_HELP_TXT)
+			return NULL; // Preserve the existing hyperlink font/behavior.
+		SetTextColor(hdc, !IsWindowEnabled(hCtrl) ? GetSysColor(COLOR_GRAYTEXT) :
+			((id == IDS_DRIVE_PROPERTIES_TXT || id == IDS_FORMAT_OPTIONS_TXT || id == IDS_STATUS_TXT) ?
+			RGB(0x25, 0x63, 0xEB) : RGB(0x0F, 0x17, 0x2A)));
+	}
+	SetBkMode(hdc, TRANSPARENT);
+	SetBkColor(hdc, RGB(0xF8, 0xFA, 0xFC));
+	SetDCBrushColor(hdc, RGB(0xF8, 0xFA, 0xFC));
+	return (HBRUSH)GetStockObject(DC_BRUSH);
+}
+
+// Call AFTER initial advanced/image toggles (and after subsequent layout changes).
+// Report measured pixels; never hide safety controls or shrink their fonts.
+BOOL NawamCheckMainWorkArea(HWND hDlg)
+{
+	MONITORINFO mi = { 0 };
+	RECT rc;
+	int height, expanded_height, width;
+	mi.cbSize = sizeof(mi);
+	if (!GetWindowRect(hDlg, &rc) ||
+		!GetMonitorInfo(MonitorFromWindow(hDlg, MONITOR_DEFAULTTONEAREST), &mi))
+		return FALSE;
+	width = rc.right - rc.left;
+	height = rc.bottom - rc.top;
+	expanded_height = height + (advanced_mode_device ? 0 : advanced_device_section_height) +
+		(advanced_mode_format ? 0 : advanced_format_section_height);
+	// Windows To Go and persistence share one mutually exclusive measured row.
+	if (!(GetWindowLongPtr(GetDlgItem(hDlg, IDS_IMAGE_OPTION_TXT), GWL_STYLE) & WS_VISIBLE))
+		expanded_height += rh;
+	uprintf("Nawam layout: current %d x %d; expanded upper bound %d x %d; work area %ld x %ld",
+		width, height, width, expanded_height, mi.rcWork.right - mi.rcWork.left, mi.rcWork.bottom - mi.rcWork.top);
+	if (width > mi.rcWork.right - mi.rcWork.left || expanded_height > mi.rcWork.bottom - mi.rcWork.top)
+		uprintf("WARNING: Expanded Nawam controls may exceed this display's work area. Use a larger display/work area; fonts are not reduced.");
+	return width <= mi.rcWork.right - mi.rcWork.left && height <= mi.rcWork.bottom - mi.rcWork.top;
+}
+
 void OnPaint(HDC hdc)
 {
-	int i;
-	COLORREF cp = is_darkmode_enabled ? DARKMODE_NORMAL_CONTROL_EDGE_COLOR : GetSysColor(COLOR_WINDOWTEXT);
-	HPEN hp = CreatePen(0, (fScale < 1.5f) ? 2 : 3, cp);
-	HPEN hop = (HPEN)SelectObject(hdc, hp);
-	for (i = 0; i < ARRAYSIZE(section_vpos); i++) {
-		MoveToEx(hdc, mw + 10, section_vpos[i], NULL);
-		LineTo(hdc, mw + fw, section_vpos[i]);
+	RECT metrics = { 8, 5, 0, 38 }, client, header, text, section;
+	LOGFONTW lf = { 0 };
+	HFONT title_font = NULL, body_font;
+	HICON logo;
+	HBRUSH brush = (HBRUSH)GetStockObject(DC_BRUSH);
+	BOOL hc = NawamHighContrast();
+	COLORREF accent = hc ? GetSysColor(COLOR_HIGHLIGHT) :
+		(is_darkmode_enabled ? RGB(0x93, 0xC5, 0xFD) : RGB(0x25, 0x63, 0xEB));
+	COLORREF ink = hc ? GetSysColor(COLOR_WINDOWTEXT) :
+		(is_darkmode_enabled ? DARKMODE_NORMAL_TEXT_COLOR : RGB(0x0F, 0x17, 0x2A));
+	int saved = SaveDC(hdc), icon_size, i, line_width;
+	if (saved == 0)
+		return;
+	MapDialogRect(hMainDialog, &metrics);
+	GetClientRect(hMainDialog, &client);
+	header = client;
+	header.bottom = metrics.bottom;
+	SetDCBrushColor(hdc, hc ? GetSysColor(COLOR_BTNFACE) :
+		(is_darkmode_enabled ? DARKMODE_NORMAL_CONTROL_BACKGROUND_COLOR : RGB(0xEF, 0xF6, 0xFF)));
+	FillRect(hdc, &header, brush);
+	icon_size = header.bottom - 2 * metrics.top;
+	// Load the original mint USB resource, without recoloring or redrawing it.
+	logo = (HICON)LoadImageW(hMainInstance, MAKEINTRESOURCEW(IDI_ICON), IMAGE_ICON,
+		icon_size, icon_size, LR_DEFAULTCOLOR);
+	if (logo != NULL) {
+		DrawIconEx(hdc, metrics.left, metrics.top, logo, icon_size, icon_size, 0, NULL, DI_NORMAL);
+		DestroyIcon(logo);
 	}
-	SelectObject(hdc, hop);
-	DeleteObject(hp);
+	body_font = (HFONT)SendMessage(hMainDialog, WM_GETFONT, 0, 0);
+	if (body_font != NULL && GetObjectW(body_font, sizeof(lf), &lf)) {
+		lf.lfHeight = -MulDiv(20, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+		lf.lfWeight = FW_SEMIBOLD;
+		title_font = CreateFontIndirectW(&lf);
+	}
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, ink);
+	text = header;
+	text.left = 2 * metrics.left + icon_size;
+	text.right -= metrics.left;
+	text.top = metrics.top;
+	if (title_font != NULL)
+		SelectObject(hdc, title_font);
+	DrawTextW(hdc, L"Nawam", -1, &text, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
+	if (body_font != NULL)
+		SelectObject(hdc, body_font);
+	text.top += MulDiv(24, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	SetTextColor(hdc, hc ? ink : (is_darkmode_enabled ? DARKMODE_NORMAL_TEXT_COLOR : RGB(0x47, 0x55, 0x69)));
+	DrawTextW(hdc, L"Bootable USB Creator", -1, &text, DT_LEFT | DT_TOP | DT_SINGLELINE | DT_NOPREFIX);
+	line_width = max(1, MulDiv(2, GetDeviceCaps(hdc, LOGPIXELSY), 96));
+	header.top = header.bottom - line_width;
+	SetDCBrushColor(hdc, accent);
+	FillRect(hdc, &header, brush);
+	// Short blue rules replace the heavy black lines. Start AFTER the measured
+	// localized headings, never across their text or behind native controls.
+	for (i = 0; i < ARRAYSIZE(section_control_ids); i++) {
+		GetWindowRect(GetDlgItem(hMainDialog, section_control_ids[i]), &section);
+		MapWindowPoints(NULL, hMainDialog, (POINT*)&section, 2);
+		section.left = section.right + metrics.left / 2;
+		section.right = mw + fw;
+		section.top = section_vpos[i];
+		section.bottom = section.top + line_width;
+		SetDCBrushColor(hdc, hc ? accent : (is_darkmode_enabled ? DARKMODE_NORMAL_CONTROL_EDGE_COLOR : RGB(0xDB, 0xE7, 0xF5)));
+		if (section.right > section.left) {
+			FillRect(hdc, &section, brush);
+			section.right = min(section.right, section.left + 3 * metrics.left);
+			SetDCBrushColor(hdc, accent);
+			FillRect(hdc, &section, brush);
+		}
+	}
+	RestoreDC(hdc, saved);
+	if (title_font != NULL)
+		DeleteObject(title_font);
 }

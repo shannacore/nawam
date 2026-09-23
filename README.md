@@ -1,121 +1,64 @@
 # Nawam
 
-Nawam is a bootable USB creation utility for Windows.
+Bootable USB Creator for Windows.
 
-Published by Shanna Studio. SHANNA Digital Systems remains the internal settings namespace.
+Copyright © 2026 Shanna Studio.
 
-Nawam is based on the open-source Rufus project.
+Website: https://nawam.shanna.id
 
-Application website: https://nawam.shanna.id
-Firebase Hosting: https://nawam.web.app
+## Download
 
-## Version and status
+Download Nawam.exe from [the releases page](https://github.com/shannacore/nawam/releases).
+No installation is required. The download includes a SHA-256 checksum and matching source code.
 
-Current version: 1.0.1. Primary build: Windows x64.
-App website metadata: https://nawam.shanna.id (custom domain managed by the owner).
-The About screen shows copyright only, without a Developed by line.
-This is an independently modified build, not an official Rufus release.
-The executable is not Authenticode-signed. Windows may display Unknown publisher.
-Do not disable system protections indiscriminately. Verify SHA-256 before use.
-Physical USB write/format and actual boot tests have NOT been automated.
+## Features
 
-## Downloads
+- Create bootable USB media from supported Windows and Linux ISO images.
+- Choose GPT or MBR and compatible UEFI or Legacy BIOS targets.
+- Select the filesystem, cluster size and volume label.
+- Monitor progress, status and detailed logs.
+- Use portable preferences with nawam.ini.
+- Open integrated help and license information.
 
-The local output is `dist/Nawam.exe`. The website links to public GitHub Releases for the initial x64 build,
-its SHA-256, and the matching complete application source package.
-Keep the source and all component licenses available when redistributing binaries.
+Available options depend on the selected image, device and Windows version.
 
-## Build x64 on Windows
+## Quick start
 
-1. Install Python 3.11+.
-2. Download w64devkit x64 2.10.0 from the official release:
-   https://github.com/skeeto/w64devkit/releases/tag/v2.10.0
-3. Verify archive SHA-256:
-   `18d0a4c71a166f8401ab6305781bec5882b40b5e06ba9807c61cb5f3b3c6325e`
-4. Extract into `tools/w64devkit`.
-5. Install the Python build dependency locally:
-   `uv pip install --target tools/python pefile==2024.8.26`
-   Or: `python -m pip install --target tools/python pefile==2024.8.26`
-6. Run from this project:
-   `python scripts/build.py --clean`
+1. Back up all important files on the USB device.
+2. Run Nawam.exe and check the device name and capacity.
+3. Select a trusted ISO image.
+4. Review the partition scheme, target system and format options.
+5. Click Start only after confirming the correct device.
+6. Wait until the operation has completed before unplugging the USB.
 
-The script builds the x86 command-line helper and x64 application through the
-upstream configure/Make graph. Internal `rufus` target names are intentional.
-The resource metadata, UI and final executable are Nawam. It then applies the
-upstream PE load-config hardening and verifies x64, GUI subsystem, DEP/ASLR,
-System32 DLL loading policy, product name, version and filename.
+Formatting and creating bootable media erase data on the selected device.
 
-Logs: `docs/build-x64.log`. Output: `dist/Nawam.exe` and `dist/SHA256SUMS.txt`.
-Close an already running Nawam before rebuilding; Windows locks loaded EXEs.
-GCC 16 requires retained load-config constants and `-fno-toplevel-reorder`.
-A warning about the disabled, unused upstream update worker is expected.
+## Portable mode
 
-## Visual Studio
+Place an empty file named nawam.ini beside Nawam.exe to keep preferences in that directory.
+Use a location where you have write permission.
 
-The retained `rufus.sln` uses `.vs/rufus.vcxproj` with TargetName `Nawam`.
-Upstream toolset: Visual Studio v145 with Windows SDK. x64, Win32 and ARM64
-configurations remain. Only MinGW x64 has been exercised on this machine.
-Do not claim x86/ARM64 binaries are tested merely because their project entries exist.
-The prebuilt `res/hogger/nawam-hogger.exe` is included as a resource.
+## Requirements
 
-## Portable configuration
+- Windows x64. Windows 11 is the primary test environment.
+- Administrator permission for disk operations.
+- A supported ISO and a USB device with sufficient capacity.
 
-Run `Nawam.exe` without installation. Put an empty `nawam.ini` beside it to enable
-portable settings. `res/nawam.ini` is a documented template.
-Normal settings use `HKCU\Software\SHANNA Digital Systems\Nawam`.
-Cache/log storage uses a Nawam directory, not Rufus's settings or cache.
-The main disk-safety mutex deliberately remains shared with Rufus to avoid
-concurrent instances of these disk utilities. Command-line helper identity is separate.
+## Release notes
 
-## Update and networking
+Version 1.0.2 includes clickable boot-mode help, monitor-aware license layout,
+clearer startup warnings and manual security-data refresh independent of executable updates.
+The compact download uses executable compression without removing application features.
 
-Self-updates are disabled in `src/nawam_policy.h`: no Nawam release feed or
-independent signing infrastructure has been implemented. A website URL alone
-is not an updater. The build cannot offer official Rufus executables as updates.
-Use the website for manual downloads. Do not enable the old updater by changing
-only a flag; a new signed feed and audited verifier are required.
-Boot-component download URLs and signature verification remain upstream.
-Automatic Fido ISO-download initialization and remote DBX checks that were coupled
-to the updater are inactive by default. Local ISO selection and embedded boot/
-revocation resources remain. Refresh the embedded security data for future releases.
+This build is unsigned. Windows may display Unknown publisher.
+Verify the download checksum. Physical USB write and boot tests are not automated.
 
-## What changed / what did not
+## Development
 
-Nawam branding, icon, metadata, 38 locale application strings, About, legal dialog,
-config/log paths, update guards, developer links, build tooling and website changed.
-About intentionally shows only Nawam and SHANNA; source attribution and third-party
-notices remain available in the separate License & Open Source dialog.
+Open Nawam.sln or follow [BUILD.md](BUILD.md) for the command-line build.
 
-Partitioning, formatting, drive enumeration, raw disk access, bootloader data,
-filesystem libraries, ISO extraction, elevation manifest and destructive warnings
-are preserved. Technical names such as Rufus MBR, resource IDs and EFI paths remain.
-`src/icon.c` and `src/vhd.c` only change website text, not disk algorithms.
+## License
 
-## Replace the icon
-
-Replace `res/nawam.ico` with a multi-resolution ICO and rebuild. Resource ID stays
-`IDI_ICON`. The USB icon is generated by `scripts/make_icon.py`
-(Pillow required only to regenerate it). Toolbar component icons retain attribution.
-
-## Tests
-
-`python -m unittest discover -s tests -v`
-
-Preservation tests compare to a read-only sibling `rufus-master` when available.
-`docs/upstream-sha256.json` records the original 816-file snapshot.
-`python scripts/qa_ui.py inspect` requires user-approved administrator privileges.
-The QA script has no Start/format action. Never automatically write to physical USBs.
-
-## Website
-
-Source: `website/`. Static HTML/CSS/JS on Firebase Hosting; no database needed.
-See `website/README.md` for tests, deploy, DNS and release packaging.
-
-## License and attribution
-
-GPL-3.0-or-later. Full text: `LICENSE.txt`.
-Upstream copyright (c) 2011-2026 Pete Batard and other respective contributors.
-Nawam modifications copyright (c) 2026 SHANNA Digital Systems.
-All original source copyright headers and component licenses are retained.
-Original project README: `README.upstream.md`.
-Upstream: https://github.com/pbatard/rufus
+GPL-3.0-or-later. See [LICENSE.txt](LICENSE.txt) and [NOTICE.md](NOTICE.md).
+The application is supplied without warranty. Component notices are also available
+under License & Open Source inside Nawam.

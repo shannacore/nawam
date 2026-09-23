@@ -30,7 +30,7 @@
     <ProjectName>Nawam</ProjectName>
     <TargetName>Nawam</TargetName>
     <ProjectGuid>{731858A7-0303-4988-877B-9C0DD6471864}</ProjectGuid>
-    <RootNamespace>rufus</RootNamespace>
+    <RootNamespace>Nawam</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

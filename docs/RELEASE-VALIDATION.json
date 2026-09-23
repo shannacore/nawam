@@ -1,0 +1,17 @@
+{
+  "version": "1.0.2",
+  "automatedTests": 48,
+  "websiteStaticTests": 12,
+  "websitePageViewportChecks": 40,
+  "websiteBehaviorGroups": 6,
+  "review": "No blocking issues in final scoped source reviews; two low-severity visual/workarea observations retained",
+  "compactRuntime": "Final compact application opened with redesigned native single panel, original USB logo, drive detected and Start disabled before ISO",
+  "compilerWarnings": [
+    "unchanged wimlib/registry.c:696 may-be-uninitialized subkey compiler warning"
+  ],
+  "physicalUsbWriteTests": false,
+  "physicalBootTests": false,
+  "unsigned": true,
+  "status": "prerelease; not a zero-bug/full compatibility guarantee",
+  "domain": "https://nawam.shanna.id"
+}

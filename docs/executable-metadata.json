@@ -2,11 +2,11 @@
   "Comments": "https://nawam.shanna.id",
   "CompanyName": "Shanna Studio",
   "FileDescription": "Nawam Bootable USB Creator",
-  "FileVersion": "1.0.1",
+  "FileVersion": "1.0.2",
   "InternalName": "Nawam",
   "LegalCopyright": "Copyright \u00a9 2026 Shanna Studio; upstream \u00a9 2011-2026 Pete Batard (GPL v3+)",
   "LegalTrademarks": "https://www.gnu.org/licenses/gpl-3.0.html",
   "OriginalFilename": "Nawam.exe",
   "ProductName": "Nawam",
-  "ProductVersion": "1.0.1"
+  "ProductVersion": "1.0.2"
 }

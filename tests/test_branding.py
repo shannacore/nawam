@@ -22,14 +22,14 @@ class BrandingTests(unittest.TestCase):
             "InternalName": "Nawam",
             "OriginalFilename": "Nawam.exe",
             "CompanyName": "Shanna Studio",
-            "FileVersion": "1.0.1",
-            "ProductVersion": "1.0.1",
+            "FileVersion": "1.0.2",
+            "ProductVersion": "1.0.2",
             "Comments": "https://nawam.shanna.id",
         }.items():
             self.assertIn(f'VALUE "{field}", "{value}"', resource)
-        self.assertIn('CAPTION "Nawam 1.0.1"', resource)
-        self.assertIn("FILEVERSION 1,0,1,0", resource)
-        self.assertIn("PRODUCTVERSION 1,0,1,0", resource)
+        self.assertIn('CAPTION "Nawam 1.0.2"', resource)
+        self.assertIn("FILEVERSION 1,0,2,0", resource)
+        self.assertIn("PRODUCTVERSION 1,0,2,0", resource)
         self.assertIn('"../res/nawam.ico"', resource)
         self.assertNotRegex(resource, r'CAPTION "[^"]*Rufus')
         self.assertIn("Pete Batard", resource)
@@ -64,7 +64,7 @@ class IsolationTests(unittest.TestCase):
     def test_update_controls_disabled(self):
         dialogs = source("src/stdlg.c")
         for expected in ['EnableWindow(hFrequency, FALSE)', 'EnableWindow(hBeta, FALSE)',
-                         'EnableWindow(GetDlgItem(hDlg, IDC_CHECK_NOW), FALSE)',
+                         'EnableWindow(GetDlgItem(hDlg, IDC_CHECK_NOW), !op_in_progress && image_path == NULL)',
                          'No Nawam update server is configured.']:
             self.assertIn(expected, dialogs)
 

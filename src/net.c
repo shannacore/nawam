@@ -35,6 +35,8 @@
 #include <virtdisk.h>
 
 #include "rufus.h"
+#include "nawam_safety.h"
+#include "nawam_security.h"
 #include "missing.h"
 #include "resource.h"
 #include "msapi_utf8.h"
@@ -58,8 +60,11 @@ extern HANDLE dialog_handle;
 extern BOOL is_x86_64;
 extern USHORT NativeMachine;
 static DWORD error_code, fido_len = 0;
+#if NAWAM_SELF_UPDATE_ENABLED
 static BOOL force_update_check = FALSE;
+#endif
 extern const char* efi_archname[ARCH_MAX];
+extern char *sbat_level_txt, *sb_active_txt, *sb_revoked_txt;
 
 #if defined(__MINGW32__)
 #define INetworkListManager_get_IsConnectedToInternet INetworkListManager_IsConnectedToInternet
@@ -114,10 +119,11 @@ static HINTERNET GetInternetSession(const char* user_agent, BOOL bRetry)
 	VARIANT_BOOL InternetConnection = VARIANT_FALSE;
 	DWORD dwFlags, dwTimeout = NET_SESSION_TIMEOUT, dwProtocolSupport = HTTP_PROTOCOL_FLAG_HTTP2;
 	HINTERNET hSession = NULL;
-	HRESULT hr = S_FALSE;
-	INetworkListManager* pNetworkListManager;
-	// Create a NetworkListManager Instance to check the network connection
-	IGNORE_RETVAL(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
+	HRESULT hr = S_FALSE, com_result;
+	DWORD saved_error;
+	INetworkListManager* pNetworkListManager = NULL;
+	// Balance COM even when the caller already initialized this apartment.
+	com_result = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 	hr = CoCreateInstance(&CLSID_NetworkListManager, NULL, CLSCTX_ALL,
 		&IID_INetworkListManager, (LPVOID*)&pNetworkListManager);
 	if (hr == S_OK) {
@@ -144,6 +150,7 @@ static HINTERNET GetInternetSession(const char* user_agent, BOOL bRetry)
 		WindowsVersion.Major, WindowsVersion.Minor, is_WOW64() ? "; WOW64" : "");
 	hSession = InternetOpenA((user_agent == NULL) ? default_agent : user_agent,
 		INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	if (hSession == NULL) goto out;
 	// Set the timeouts
 	InternetSetOptionA(hSession, INTERNET_OPTION_CONNECT_TIMEOUT, (LPVOID)&dwTimeout, sizeof(dwTimeout));
 	InternetSetOptionA(hSession, INTERNET_OPTION_SEND_TIMEOUT, (LPVOID)&dwTimeout, sizeof(dwTimeout));
@@ -154,6 +161,10 @@ static HINTERNET GetInternetSession(const char* user_agent, BOOL bRetry)
 	InternetSetOptionA(hSession, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, (LPVOID)&dwProtocolSupport, sizeof(dwProtocolSupport));
 
 out:
+	saved_error = GetLastError();
+	if (pNetworkListManager != NULL) INetworkListManager_Release(pNetworkListManager);
+	if (SUCCEEDED(com_result)) CoUninitialize();
+	SetLastError(saved_error);
 	return hSession;
 }
 
@@ -173,8 +184,8 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 	const char* accept_types[] = {"*/*\0", NULL};
 	const char* short_name;
 	unsigned char buf[DOWNLOAD_BUFFER_SIZE];
-	char hostname[64], urlpath[128], strsize[32], *bak_file = NULL;
-	BOOL r = FALSE;
+	char hostname[256], urlpath[2048], strsize[32], *bak_file = NULL;
+	BOOL r = FALSE, file_created = FALSE, backup_moved = FALSE;
 	DWORD dwSize, dwWritten, dwDownloaded;
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	HINTERNET hSession = NULL, hConnection = NULL, hRequest = NULL;
@@ -198,13 +209,6 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 		uprintf("Downloading %s", url);
 	}
 
-	// If an old file with the same name exists, rename it so we can restore it in case of failure
-	if (file != NULL && PathFileExistsU((char*)file) && (bak_file = calloc(1, strlen(file) + 6)) != NULL) {
-		strcpy(bak_file, file);
-		strcat(bak_file, ".bak");
-		MoveFileU(file, bak_file);
-	}
-
 	if ( (!InternetCrackUrlA(url, (DWORD)safe_strlen(url), 0, &UrlParts))
 	  || (UrlParts.lpszHostName == NULL) || (UrlParts.lpszUrlPath == NULL)) {
 		uprintf("Unable to decode URL: %s", WindowsErrorString());
@@ -225,7 +229,7 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 	}
 
 	hRequest = HttpOpenRequestA(hConnection, "GET", UrlParts.lpszUrlPath, NULL, NULL, accept_types,
-		INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP | INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS |
+		INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS |
 		INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_HYPERLINK |
 		((UrlParts.nScheme == INTERNET_SCHEME_HTTPS) ? INTERNET_FLAG_SECURE : 0), (DWORD_PTR)NULL);
 	if (hRequest == NULL) {
@@ -242,11 +246,13 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 	// Must use "Accept-Encoding: identity" to get the file size
 	// This is needed for GitHub as the Microsoft HTTP APIs can't seem to read content-length for
 	// compressed content from GitHub, and using "identity" disables compression.
-	HttpSendRequestA(hRequest, "Accept-Encoding: identity", -1L, NULL, 0);
+	if (!HttpSendRequestA(hRequest, "Accept-Encoding: identity", -1L, NULL, 0))
+		goto out;
 
 	// Get the file size
 	dwSize = sizeof(DownloadStatus);
-	HttpQueryInfoA(hRequest, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&DownloadStatus, &dwSize, NULL);
+	if (!HttpQueryInfoA(hRequest, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&DownloadStatus, &dwSize, NULL))
+		goto out;
 	if (DownloadStatus != 200) {
 		error_code = ERROR_INTERNET_ITEM_NOT_FOUND;
 		SetLastError(RUFUS_ERROR(error_code));
@@ -258,7 +264,12 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 		uprintf("Unable to retrieve file length: %s", WindowsErrorString());
 		goto out;
 	}
-	total_size = strtoull(strsize, NULL, 10);
+	if (dwSize >= sizeof(strsize) || !NawamParseContentLength(strsize, dwSize, &total_size) ||
+		!NawamDownloadLengthValid(total_size, file == NULL)) {
+		SetLastError(ERROR_INVALID_DATA);
+		uprintf("Rejected invalid or excessive download length");
+		goto out;
+	}
 	if (hProgressDialog != NULL) {
 		char msg[128];
 		uprintf("File length: %s", SizeToHumanReadable(total_size, FALSE, FALSE));
@@ -270,11 +281,22 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 	}
 
 	if (file != NULL) {
+		if (PathFileExistsU((char*)file)) {
+			bak_file = calloc(1, strlen(file) + 6);
+			if (bak_file == NULL)
+				goto out;
+			strcpy(bak_file, file);
+			strcat(bak_file, ".bak");
+			if (!MoveFileU(file, bak_file))
+				goto out;
+			backup_moved = TRUE;
+		}
 		hFile = CreateFileU(file, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (hFile == INVALID_HANDLE_VALUE) {
 			uprintf("Unable to create file '%s': %s", short_name, WindowsErrorString());
 			goto out;
 		}
+		file_created = TRUE;
 	} else {
 		if (buffer == NULL) {
 			uprintf("No buffer pointer provided for download");
@@ -293,8 +315,16 @@ uint64_t DownloadToFileOrBufferEx(const char* url, const char* file, const char*
 		// User may have cancelled the download
 		if (IS_ERROR(ErrorStatus))
 			goto out;
-		if (!InternetReadFile(hRequest, buf, sizeof(buf), &dwDownloaded) || (dwDownloaded == 0))
+		if (!InternetReadFile(hRequest, buf, sizeof(buf), &dwDownloaded))
+			goto out;
+		if (dwDownloaded == 0)
 			break;
+		if (!NawamDownloadChunkValid(total_size, size, dwDownloaded)) {
+			SetLastError(ERROR_INVALID_DATA);
+			ErrorStatus = RUFUS_ERROR(ERROR_INVALID_DATA);
+			uprintf("Rejected download chunk exceeding declared length");
+			goto out;
+		}
 		if (hProgressDialog != NULL)
 			UpdateProgressWithInfo(OP_NOOP, MSG_241, size, total_size);
 		if (file != NULL) {
@@ -332,15 +362,16 @@ out:
 		CloseHandle(hFile);
 	}
 	if (!r) {
-		if (file != NULL)
+		if (file_created)
 			DeleteFileU(file);
-		if (bak_file != NULL)
+		if (backup_moved)
 			MoveFileU(bak_file, file);
 		if (buffer != NULL)
 			safe_free(*buffer);
 	} else if (bak_file != NULL) {
 		DeleteFileU(bak_file);
 	}
+	safe_free(bak_file);
 	if (hRequest)
 		InternetCloseHandle(hRequest);
 	if (hConnection)
@@ -441,6 +472,7 @@ HANDLE DownloadSignedFileThreaded(const char* url, const char* file, HWND hProgr
 	return CreateThread(NULL, 0, DownloadSignedFileThread, &args, 0, NULL);
 }
 
+#if NAWAM_SELF_UPDATE_ENABLED
 static __inline uint64_t to_uint64_t(uint16_t x[3]) {
 	int i;
 	uint64_t ret = 0;
@@ -448,6 +480,7 @@ static __inline uint64_t to_uint64_t(uint16_t x[3]) {
 		ret = (ret << 16) + x[i];
 	return ret;
 }
+#endif
 
 BOOL UseLocalDbx(int arch)
 {
@@ -456,82 +489,213 @@ BOOL UseLocalDbx(int arch)
 	return (uint64_t)ReadSetting64(reg_name) > dbx_info[arch - 1].timestamp;
 }
 
-static void CheckForDBXUpdates(int verbose)
+/* NAWAM_SECURITY_DBX_BEGIN */
+static BOOL NawamReadDbxCache(const char* path, BYTE** data, DWORD* size)
 {
-	int i, r;
-	char reg_name[32], timestamp_url[256], path[MAX_PATH];
-	char *p, *c, *rep, *buf = NULL;
-	struct tm t = { 0 };
-	uint64_t size, timestamp;
-	BOOL already_prompted = FALSE;
+	wchar_t* wide = utf8_to_wchar(path);
+	HANDLE file = INVALID_HANDLE_VALUE;
+	LARGE_INTEGER length;
+	DWORD read = 0;
+	BOOL valid = FALSE;
+	*data = NULL;
+	*size = 0;
+	if (wide == NULL) return FALSE;
+	file = CreateFileW(wide, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	free(wide);
+	if (file == INVALID_HANDLE_VALUE) return FALSE;
+	if (!GetFileSizeEx(file, &length) || length.QuadPart <= 0 ||
+		!NawamDownloadLengthValid((uint64_t)length.QuadPart, TRUE)) goto out;
+	*size = (DWORD)length.QuadPart;
+	*data = malloc(*size);
+	if (*data != NULL && ReadFile(file, *data, *size, &read, NULL) && read == *size)
+		valid = NawamDbxValid(*data, *size);
+out:
+	CloseHandle(file);
+	if (!valid) { safe_free(*data); *size = 0; }
+	return valid;
+}
 
+static BOOL NawamCommitDbxCache(const char* path, const BYTE* data, DWORD size)
+{
+	wchar_t *target = NULL, *directory = NULL, *separator;
+	wchar_t temporary[MAX_PATH] = { 0 };
+	HANDLE file = INVALID_HANDLE_VALUE;
+	DWORD written = 0, read = 0;
+	BYTE* verify = NULL;
+	BOOL result = FALSE;
+	if (!NawamDbxValid(data, size)) return FALSE;
+	target = utf8_to_wchar(path);
+	directory = utf8_to_wchar(path);
+	if (target == NULL || directory == NULL) goto out;
+	separator = wcsrchr(directory, L'\\');
+	if (separator == NULL) goto out;
+	*separator = 0;
+	if (!CreateDirectoryW(directory, NULL) && GetLastError() != ERROR_ALREADY_EXISTS) goto out;
+	/* A sibling temp ensures replacement never crosses a volume boundary. */
+	if (!GetTempFileNameW(directory, L"ndb", 0, temporary)) goto out;
+	file = CreateFileW(temporary, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH, NULL);
+	if (file == INVALID_HANDLE_VALUE) goto out;
+	if (!WriteFile(file, data, size, &written, NULL) || written != size || !FlushFileBuffers(file)) goto out;
+	verify = malloc(size);
+	if (verify == NULL || SetFilePointer(file, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER ||
+		!ReadFile(file, verify, size, &read, NULL) || read != size || memcmp(data, verify, size) ||
+		!NawamDbxValid(verify, size)) goto out;
+	if (!CloseHandle(file)) { file = INVALID_HANDLE_VALUE; goto out; }
+	file = INVALID_HANDLE_VALUE;
+	result = MoveFileExW(temporary, target, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
+out:
+	if (file != INVALID_HANDLE_VALUE) CloseHandle(file);
+	if (temporary[0] != 0 && !result) DeleteFileW(temporary);
+	free(target);
+	free(directory);
+	free(verify);
+	return result;
+}
+
+static void NawamRefreshDbx(unsigned* ok, unsigned* failed)
+{
+	unsigned i;
+	char timestamp_url[512], pinned_url[512], path[MAX_PATH], key[32], sha[41];
+	const char *part, *p;
+	char* out;
+	BYTE *metadata = NULL, *data = NULL, *cached = NULL;
+	uint64_t size, timestamp;
+	int64_t previous, now;
+	DWORD cache_size;
+	int n;
 	for (i = 0; i < ARRAYSIZE(dbx_info); i++) {
-		// Get the epoch of the last commit
-		timestamp = 0;
-		static_strcpy(timestamp_url, dbx_info[i].url);
-		p = strstr(timestamp_url, "contents/");
-		if (p == NULL)
-			continue;
-		*p = 0;
-		rep = replace_char(&p[9], '/', "%2F");
-		static_strcat(timestamp_url, "commits?path=");
-		static_strcat(timestamp_url, rep);
-		free(rep);
-		static_strcat(timestamp_url, "&page=1&per_page=1");
-		vuprintf("Querying %s for DBX update timestamp", timestamp_url);
-		size = DownloadToFileOrBuffer(timestamp_url, NULL, (BYTE**)&buf, NULL, FALSE);
-		if (size == 0)
-			continue;
-		// Assumes that the GitHub JSON commit dates are of the form:
-		// "date":[ ]*"2025-02-24T20:20:22Z"
-		p = strstr(buf, "\"date\":");
-		if (p == NULL) {
-			safe_free(buf);
+		part = strstr(dbx_info[i].url, "contents/");
+		if (part == NULL) goto fail;
+		n = snprintf(timestamp_url, sizeof(timestamp_url), "%.*scommits?path=",
+			(int)(part - dbx_info[i].url), dbx_info[i].url);
+		if (n < 0 || n >= (int)sizeof(timestamp_url)) goto fail;
+		out = timestamp_url + n;
+		for (p = part + 9; *p != 0; p++) {
+			if ((size_t)(out - timestamp_url) + 32 >= sizeof(timestamp_url)) goto fail;
+			if (*p == '/') { memcpy(out, "%2F", 3); out += 3; }
+			else *out++ = *p;
+		}
+		strcpy(out, "&page=1&per_page=1");
+		size = DownloadToFileOrBuffer(timestamp_url, NULL, &metadata, NULL, FALSE);
+		if (!NawamCommitTimestamp((char*)metadata, (size_t)size, &timestamp, sha)) goto fail;
+		safe_free(metadata);
+		now = (int64_t)time(NULL);
+		if (now <= 0 || timestamp > (uint64_t)now + 86400) goto fail;
+		static_sprintf(key, "DBXTimestamp_%s", efi_archname[i + 1]);
+		previous = ReadSetting64(key);
+		if (previous < 0 || (uint64_t)previous > (uint64_t)now + 86400) goto fail;
+		if (timestamp <= dbx_info[i].timestamp && (uint64_t)previous <= dbx_info[i].timestamp) {
+			(*ok)++;
+			uprintf("Security refresh: embedded DBX %s is current", efi_archname[i + 1]);
 			continue;
 		}
-		c = &p[7];
-		while (*c == ' ' || *c == '"')
-			c++;
-		p = c;
-		while (*c != '"' && *c != '\0')
-			c++;
-		*c = 0;
-		// "Thank you, X3J11 ANSI committee, for introducing the well thought through 'struct tm'", said ABSOLUTELY NOONE ever!
-		r = sscanf(p, "%d-%d-%dT%d:%d:%dZ", &t.tm_year, &t.tm_mon, &t.tm_mday, &t.tm_hour, &t.tm_min, &t.tm_sec);
-		safe_free(buf);
-		if (r != 6)
-			continue;
-		t.tm_year -= 1900;
-		t.tm_mon -= 1;
-		timestamp = _mkgmtime64(&t);
-		vuprintf("DBX update timestamp is %" PRId64, timestamp);
-		static_sprintf(reg_name, "DBXTimestamp_%s", efi_archname[i + 1]);
-		// Check if we have an external DBX that is newer than embedded/last downloaded
-		if (timestamp <= dbx_info[i].timestamp)
-			continue;
-		static_sprintf(path, "%s\\%s\\dbx_%s.bin", app_data_dir, FILES_DIR, efi_archname[i + 1]);
-		if (PathFileExistsU(path) && timestamp <= (uint64_t)ReadSetting64(reg_name))
-			continue;
-		if (!already_prompted) {
-			r = Notification(MB_YESNO | MB_ICONWARNING, lmprintf(MSG_353), lmprintf(MSG_354));
-			already_prompted = TRUE;
-			if (r != IDYES)
-				break;
-			IGNORE_RETVAL(_chdirU(app_data_dir));
-			IGNORE_RETVAL(_mkdir(FILES_DIR));
-			IGNORE_RETVAL(_chdir(FILES_DIR));
+		n = snprintf(path, sizeof(path), "%s\\%s\\dbx_%s.bin", app_data_dir, FILES_DIR, efi_archname[i + 1]);
+		if (n < 0 || n >= (int)sizeof(path)) goto fail;
+		if ((uint64_t)previous >= timestamp) {
+			if (NawamReadDbxCache(path, &cached, &cache_size)) {
+				safe_free(cached);
+				(*ok)++;
+				continue;
+			}
+			/* Repair a missing/corrupt equal-version cache, never roll back. */
+			if ((uint64_t)previous > timestamp) goto fail;
 		}
-		if (DownloadToFileOrBuffer(dbx_info[i].url, path, NULL, NULL, FALSE) != 0) {
-			WriteSetting64(reg_name, timestamp);
-			uprintf("Saved %s as 'dbx_%s.bin'", dbx_info[i].url, efi_archname[i + 1]);
-		} else
-			uprintf("WARNING: Failed to download %s", dbx_info[i].url);
+		n = snprintf(pinned_url, sizeof(pinned_url), "%s?ref=%s", dbx_info[i].url, sha);
+		if (n < 0 || n >= (int)sizeof(pinned_url)) goto fail;
+		size = DownloadToFileOrBuffer(pinned_url, NULL, &data, NULL, FALSE);
+		if (!NawamDownloadLengthValid(size, TRUE) || !NawamDbxValid(data, (size_t)size) ||
+			!NawamCommitDbxCache(path, data, (DWORD)size)) goto fail;
+		/* Publish the monotonic marker only after validated atomic replacement. */
+		if (!WriteSetting64(key, (int64_t)timestamp) || ReadSetting64(key) != (int64_t)timestamp) goto fail;
+		safe_free(data);
+		(*ok)++;
+		uprintf("Security refresh: saved Microsoft DBX %s (%llu bytes)", efi_archname[i + 1], size);
+		continue;
+fail:
+		safe_free(metadata);
+		safe_free(data);
+		safe_free(cached);
+		(*failed)++;
+		uprintf("Security refresh: DBX %s failed (download, validation, cache or setting); prior valid data retained when possible",
+			efi_archname[i + 1]);
 	}
 }
+/* NAWAM_SECURITY_DBX_END */
+
+/* NAWAM_SECURITY_TEXT_BEGIN */
+/* Caller owns the operation gate and keeps the modal disabled until joined.
+ * Parsed SBAT products point into their text buffer, so transfer both together.
+ */
+static BOOL NawamRefreshSecurityText(unsigned kind)
+{
+	static const char* urls[] = { RUFUS_URL "/sbat_level.txt", RUFUS_URL "/sb_active.txt", RUFUS_URL "/sb_revoked.txt" };
+	char* text = NULL;
+	sbat_entry_t* sbat = NULL;
+	thumbprint_list_t* certs = NULL;
+	uint64_t size;
+	unsigned expected, count = 0;
+	size = DownloadToFileOrBuffer(urls[kind], NULL, (BYTE**)&text, NULL, FALSE);
+	expected = NawamSecurityTextValid(text, (size_t)size, kind != 0);
+	if (expected == 0)
+		goto fail;
+	if (kind == 0) {
+		sbat = GetSbatEntries(text);
+		if (sbat == NULL)
+			goto fail;
+		while (sbat[count].product != NULL) count++;
+		if (count != expected)
+			goto fail;
+		safe_free(sbat_entries);
+		safe_free(sbat_level_txt);
+		sbat_entries = sbat;
+		sbat_level_txt = text;
+	} else {
+		certs = GetThumbprintEntries(text);
+		if (certs == NULL || certs->count != expected)
+			goto fail;
+		if (kind == 1) {
+			safe_free(sb_active_certs);
+			safe_free(sb_active_txt);
+			sb_active_certs = certs;
+			sb_active_txt = text;
+		} else {
+			safe_free(sb_revoked_certs);
+			safe_free(sb_revoked_txt);
+			sb_revoked_certs = certs;
+			sb_revoked_txt = text;
+		}
+	}
+	uprintf("Security refresh: accepted %u entries from %s", expected, urls[kind]);
+	return TRUE;
+fail:
+	free(sbat);
+	free(certs);
+	free(text);
+	uprintf("Security refresh: download/validation failed for %s; previous data retained", urls[kind]);
+	return FALSE;
+}
+
+DWORD WINAPI NawamSecurityRefreshThread(LPVOID param)
+{
+	unsigned i, ok = 0, failed = 0;
+	IGNORE_RETVAL(param);
+	/* op_in_progress is set by the manual caller before creating this thread. */
+	if (!op_in_progress || image_path != NULL)
+		return 0;
+	for (i = 0; i < 3; i++) {
+		if (NawamRefreshSecurityText(i)) ok++; else failed++;
+	}
+	NawamRefreshDbx(&ok, &failed);
+	uprintf("Security refresh: %u data sources refreshed/current; %u failed", ok, failed);
+	return ok == 0 ? 0 : failed == 0 ? 2 : 1;
+}
+/* NAWAM_SECURITY_TEXT_END */
 
 /*
  * Background thread to check for updates (including UEFI DBX updates)
  */
+#if NAWAM_SELF_UPDATE_ENABLED
 static DWORD WINAPI CheckForUpdatesThread(LPVOID param)
 {
 	BOOL releases_only = TRUE, found_new_version = FALSE;
@@ -586,7 +750,7 @@ static DWORD WINAPI CheckForUpdatesThread(LPVOID param)
 
 	// Perform the DBX Update check
 	PrintInfoDebug(3000, MSG_352);
-	CheckForDBXUpdates(verbose);
+	{ unsigned ok = 0, failed = 0; NawamRefreshDbx(&ok, &failed); }
 
 	PrintInfoDebug(3000, MSG_243);
 	status++;	// 1
@@ -648,7 +812,7 @@ static DWORD WINAPI CheckForUpdatesThread(LPVOID param)
 		for (i = 0; i < ARRAYSIZE(verpos); i++) {
 			vvuprintf("Trying %s", UrlParts.lpszUrlPath);
 			hRequest = HttpOpenRequestA(hConnection, "GET", UrlParts.lpszUrlPath, NULL, NULL, accept_types,
-				INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP | INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS |
+				INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS |
 				INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_HYPERLINK |
 				((UrlParts.nScheme == INTERNET_SCHEME_HTTPS) ? INTERNET_FLAG_SECURE : 0), (DWORD_PTR)NULL);
 			if (hRequest == NULL) {
@@ -656,7 +820,8 @@ static DWORD WINAPI CheckForUpdatesThread(LPVOID param)
 				goto out;
 			}
 			// Must use "Accept-Encoding: identity" to get the file size
-			HttpSendRequestA(hRequest, "Accept-Encoding: identity", -1L, NULL, 0);
+			if (!HttpSendRequestA(hRequest, "Accept-Encoding: identity", -1L, NULL, 0))
+				goto out;
 
 			// Ensure that we get a text file
 			dwSize = sizeof(dwStatus);
@@ -770,6 +935,8 @@ out:
 	CoUninitialize();
 	ExitThread(0);
 }
+
+#endif
 
 /*
  * Initiate a check for updates. If force is true, ignore the wait period
@@ -1004,7 +1171,9 @@ BOOL DownloadISO()
 
 BOOL IsDownloadable(const char* url)
 {
-	DWORD dwSize, dwTotalSize = 0;
+	DWORD dwSize;
+	uint64_t dwTotalSize = 0;
+	char strsize[32];
 	const char* accept_types[] = { "*/*\0", NULL };
 	char hostname[64], urlpath[128];
 	HINTERNET hSession = NULL, hConnection = NULL, hRequest = NULL;
@@ -1032,22 +1201,26 @@ BOOL IsDownloadable(const char* url)
 		goto out;
 
 	hRequest = HttpOpenRequestA(hConnection, "GET", UrlParts.lpszUrlPath, NULL, NULL, accept_types,
-		INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP | INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS |
+		INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS |
 		INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_NO_UI | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_HYPERLINK |
 		((UrlParts.nScheme == INTERNET_SCHEME_HTTPS) ? INTERNET_FLAG_SECURE : 0), (DWORD_PTR)NULL);
 	if (hRequest == NULL)
 		goto out;
 
 	// Must use "Accept-Encoding: identity" to get the file size
-	HttpSendRequestA(hRequest, "Accept-Encoding: identity", -1L, NULL, 0);
+	if (!HttpSendRequestA(hRequest, "Accept-Encoding: identity", -1L, NULL, 0))
+		goto out;
 
 	// Get the file size
 	dwSize = sizeof(DownloadStatus);
-	HttpQueryInfoA(hRequest, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&DownloadStatus, &dwSize, NULL);
+	if (!HttpQueryInfoA(hRequest, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&DownloadStatus, &dwSize, NULL))
+		goto out;
 	if (DownloadStatus != 200)
 		goto out;
-	dwSize = sizeof(dwTotalSize);
-	HttpQueryInfoA(hRequest, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&dwTotalSize, &dwSize, NULL);
+	dwSize = sizeof(strsize);
+	if (!HttpQueryInfoA(hRequest, HTTP_QUERY_CONTENT_LENGTH, (LPVOID)strsize, &dwSize, NULL) ||
+		dwSize >= sizeof(strsize) || !NawamParseContentLength(strsize, dwSize, &dwTotalSize))
+		dwTotalSize = 0;
 
 out:
 	if (hRequest)

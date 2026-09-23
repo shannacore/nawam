@@ -15,9 +15,9 @@ test('five complete static English pages have paired navigation and search metad
     for (const lang of ['id', 'en']) {
       const html = read(`public/${lang === 'en' ? 'en/' : ''}${page}`);
       assert.match(html, new RegExp(`<html lang="${lang}"`));
-      assert.ok(html.includes(`rel="canonical" href="https://nawam.web.app${route(page, lang)}"`));
+      assert.ok(html.includes(`rel="canonical" href="https://nawam.shanna.id${route(page, lang)}"`));
       for (const alternate of ['id', 'en']) {
-        assert.ok(html.includes(`hreflang="${alternate}" href="https://nawam.web.app${route(page, alternate)}"`));
+        assert.ok(html.includes(`hreflang="${alternate}" href="https://nawam.shanna.id${route(page, alternate)}"`));
         if (alternate !== lang) assert.ok(html.includes(`href="${route(page, alternate)}" lang="${alternate}" hreflang="${alternate}"`));
       }
       assert.ok(html.includes('hreflang="x-default"'));
@@ -50,7 +50,7 @@ test('English content includes every home section, warnings, legal and privacy d
   assert.match(svg, /Drive Properties/);
   assert.ok(!/Ilustrasi|Perangkat|PILIH|SIAP/.test(svg));
   const sitemap = read('public/sitemap.xml');
-  for (const p of pages.filter(p => p !== '404.html')) assert.ok(sitemap.includes(`https://nawam.web.app${route(p, 'en')}`));
+  for (const p of pages.filter(p => p !== '404.html')) assert.ok(sitemap.includes(`https://nawam.shanna.id${route(p, 'en')}`));
   assert.ok(!sitemap.includes('/404.html'), 'Error pages should not enter sitemap');
 });
 
@@ -67,7 +67,7 @@ async function runSite({lang = 'en', data = release, hash = '', clipboardFails =
   const links = [element({href: '/', lang: 'id'}), element({href: '/en/', lang: 'en'})];
   const events = {};
   let copied = null, fetches = 0;
-  const location = {hash, pathname: lang === 'en' ? '/en/' : '/', origin: 'https://nawam.web.app'};
+  const location = {hash, pathname: lang === 'en' ? '/en/' : '/', origin: 'https://nawam.shanna.id'};
   const sandbox = {
     document: {
       documentElement: {lang},
@@ -114,10 +114,10 @@ test('release metadata fails closed for invalid fields and foreign or mismatched
   const cases = [null, [], {}, {...release, available: 'true'}, {...release, architecture: 'arm64'},
     ...[0, -1, 1.1, '5037056', null, Number.MAX_SAFE_INTEGER + 1].map(bytes => ({...release, bytes})),
     ...['', 'a'.repeat(63), 'G'.repeat(64), release.sha256 + '\n', null, [release.sha256]].map(sha256 => ({...release, sha256})),
-    ...['9.9.9', '1.0.1\n', 101, null].map(version => ({...release, version})),
+    ...['9.9.9', '1.0.2\n', 101, null].map(version => ({...release, version})),
     ...[release.url.replace('github.com', 'github.com.evil.test'), release.url.replace('shannacore', 'other'),
-      release.url.replace('nawam-releases', 'another-repo'), release.url.replace('https:', 'http:'),
-      release.url.replace('/v1.0.1/', '/v9.9.9/'), release.url + '?redirect=evil', release.url + '#fragment',
+      release.url.replace('/nawam/', '/another-repo/'), release.url.replace('https:', 'http:'),
+      release.url.replace('/v1.0.2/', '/v9.9.9/'), release.url + '?redirect=evil', release.url + '#fragment',
       release.url.replace('github.com', 'user@github.com')].map(url => ({...release, url}))];
   for (const data of cases) {
     const state = await runSite({data});
