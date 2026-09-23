@@ -1,4 +1,15 @@
-# Nawam 1.0.0 — change and verification report
+# Nawam — change and verification report
+
+## 1.0.1 identity update
+
+Executable publisher/CompanyName is now Shanna Studio. About has copyright only,
+without the Developed by line. Application links use https://nawam.shanna.id.
+The website still runs at https://nawam.web.app; custom-domain DNS is owner-managed.
+Version resources/title use 1.0.1. Internal SHANNA Digital Systems settings namespace
+is unchanged. No disk algorithms changed. 13 regression tests pass and a fresh
+x64 build verifies CompanyName, website, version and PE security flags.
+
+## Initial 1.0.0 implementation
 
 ## Source isolation
 

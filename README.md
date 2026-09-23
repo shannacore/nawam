@@ -2,16 +2,18 @@
 
 Nawam is a bootable USB creation utility for Windows.
 
-Developed by SHANNA Digital Systems.
+Published by Shanna Studio. SHANNA Digital Systems remains the internal settings namespace.
 
 Nawam is based on the open-source Rufus project.
 
-Website: https://nawam.web.app
+Application website: https://nawam.shanna.id
 Firebase Hosting: https://nawam.web.app
 
 ## Version and status
 
-Initial version: 1.0.0. Primary build: Windows x64.
+Current version: 1.0.1. Primary build: Windows x64.
+App website metadata: https://nawam.shanna.id (custom domain managed by the owner).
+The About screen shows copyright only, without a Developed by line.
 This is an independently modified build, not an official Rufus release.
 The executable is not Authenticode-signed. Windows may display Unknown publisher.
 Do not disable system protections indiscriminately. Verify SHA-256 before use.

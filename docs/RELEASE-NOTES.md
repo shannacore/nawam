@@ -1,24 +1,32 @@
-# Nawam 1.0.0 — initial x64 build
+# Nawam 1.0.1 — publisher and About update
 
-Bootable USB Creator by SHANNA Digital Systems.
-Website: https://nawam.web.app
-Primary address: https://nawam.web.app.
+Bootable USB Creator. Copyright © 2026 Shanna Studio.
 
-Assets:
-- Nawam.exe: Windows x64 application.
-- Nawam-1.0.0-source.zip: corresponding complete application source, resources,
-  third-party notices and instructions for building this modified release.
-- SHA256SUMS.txt: SHA-256 checksums for both packages.
+Official application website: https://nawam.shanna.id
+Firebase hosting remains available: https://nawam.web.app
+The custom domain is managed separately by the owner; this update does not
+claim that DNS or TLS for it has been configured.
 
-Based on the open-source Rufus project. GPL-3.0-or-later.
-Copyright 2011-2026 Pete Batard and respective upstream contributors.
-Nawam modifications copyright 2026 SHANNA Digital Systems.
+## Changes
 
-This is an initial, unsigned build. No Authenticode certificate is included.
-Windows may display Unknown publisher. Check SHA-256 before running.
-Build/resource tests passed; physical USB write and boot compatibility have not
-been tested automatically. Back up USB data and verify the target drive.
-Automatic self-updates are disabled; no other application's executable is offered.
+- Windows executable CompanyName: Shanna Studio.
+- About: Nawam 1.0.1, Bootable USB Creator, copyright Shanna Studio and website.
+- Removed the Developed by line from About.
+- Application website links now use https://nawam.shanna.id.
+- SHANNA Digital Systems remains the internal configuration namespace to retain
+  existing settings. No disk/format/partitioning algorithms changed.
 
-The About screen contains Nawam/developer information only. Required upstream
-and third-party legal notices remain in License & Open Source and in source.
+## Assets
+
+- Nawam.exe — Windows x64 application.
+- Nawam-1.0.1-source.zip — matching application source, resources and build instructions.
+- SHA256SUMS.txt — checksums for both packages.
+
+13 source regression tests and PE/resource verification pass.
+This build is unsigned: Windows UAC may still show Unknown publisher.
+No physical USB write or boot tests were automated. Back up data before use.
+Self-updates remain disabled; install this release manually.
+
+Based on the open-source Rufus project, GPL-3.0-or-later.
+Copyright © 2011–2026 Pete Batard and respective upstream contributors.
+Original license and attribution remain in License & Open Source and source.

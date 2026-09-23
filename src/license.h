@@ -22,19 +22,18 @@ const char* about_blurb_format =
 "\\b\\fs28 Nawam %d.%d.%d\\b0\\line\n"
 "\\fs20 Bootable USB Creator\\line\n"
 "\\line\n"
-"\\fs18 Developed by SHANNA Digital Systems\\line\n"
-"Copyright © 2026 SHANNA Digital Systems\\line\n"
+"\\fs18 Copyright © 2026 Shanna Studio\\line\n"
 "\\line\n"
-"https://nawam.web.app}";
+"https://nawam.shanna.id}";
 
 const char* legal_notice_format =
 "{\\rtf1\\ansi\\fs18\n"
 "\\b Nawam - License & Open Source\\b0\\line\n"
 "Nawam is based on the open-source Rufus project.\\line\n"
 "Copyright © 2011-2026 Pete Batard\\line\n"
-"Nawam modifications: Copyright © 2026 SHANNA Digital Systems\\line\n"
+"Nawam modifications: Copyright © 2026 Shanna Studio\\line\n"
 "Upstream source: https://github.com/pbatard/rufus\\line\n"
-"Nawam support and source: https://nawam.web.app\\line\n"
+"Nawam support and source: https://nawam.shanna.id\\line\n"
 "\\line\n"
 "You may redistribute and modify this software under the GNU GPL v3 or later.\\line\n"
 "This software is provided WITHOUT ANY WARRANTY, including merchantability\\line\n"

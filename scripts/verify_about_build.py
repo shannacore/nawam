@@ -25,8 +25,10 @@ metadata = {k.decode(): v.decode() for group in pe.FileInfo for item in group
             if hasattr(item, "StringTable") for table in item.StringTable
             for k, v in table.entries.items()}
 assert metadata["ProductName"] == "Nawam"
-assert metadata["FileVersion"] == "1.0.0"
+assert metadata["FileVersion"] == "1.0.1"
 assert metadata["OriginalFilename"] == "Nawam.exe"
+assert metadata["CompanyName"] == "Shanna Studio"
+assert metadata["Comments"] == "https://nawam.shanna.id"
 header = (ROOT / "src/license.h").read_text(encoding="utf-8")
 constants = {}
 for name in ("about_blurb_format", "legal_notice_format", "additional_copyrights", "gplv3"):
@@ -89,7 +91,7 @@ assert sum(bool(c["style"] & 0x200000) for c in legal["controls"]) == 3
 assert {1032, 1033}.issubset({c["id"] for c in legal["controls"]})
 pe.close()
 digest = hashlib.sha256(data).hexdigest()
-output = ROOT / "dist/Nawam-1.0.0-x64.exe"
+output = ROOT / "dist/Nawam-1.0.1-x64.exe"
 if not output.exists() or hashlib.sha256(output.read_bytes()).hexdigest() != digest:
     shutil.copy2(source, output)
 assert hashlib.sha256(output.read_bytes()).hexdigest() == digest
@@ -98,6 +100,7 @@ report = dict(artifact=str(output), sha256=digest, bytes=len(data), metadata=met
               embedded_text_bytes=constants, about=about, legal=legal,
               pe_checks="x64 Windows GUI, DEP, ASLR, DependentLoadFlags=0x800",
               live_ui="Not verified: QA process is not elevated",
-              canonical_publish="Blocked: replacing dist/Nawam.exe returned WinError 5")
+              canonical_publish=("Verified: canonical executable matches this artifact"
+                  if (ROOT / "dist/Nawam.exe").read_bytes() == data else "Staged artifact differs from canonical executable"))
 (ROOT / "docs/about-build-validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2))

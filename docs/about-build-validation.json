@@ -1,22 +1,22 @@
 {
-  "artifact": "D:\\ZDUMP\\MASTER WEB\\SHANNAPP\\SHANNA STUDIO DEV\\Nawam\\dist\\Nawam-1.0.0-x64.exe",
-  "sha256": "c076782cdabbd5ec9a73c6ddac497339c3819d763832325a9c1a67338399fa3d",
-  "bytes": 5016576,
+  "artifact": "D:\\ZDUMP\\MASTER WEB\\SHANNAPP\\SHANNA STUDIO DEV\\Nawam\\dist\\Nawam-1.0.1-x64.exe",
+  "sha256": "6355165f162a71ad8469ef3dff6489e4c7b7ce240aae113603b18bd65db71ffb",
+  "bytes": 5037056,
   "metadata": {
     "Comments": "https://nawam.shanna.id",
-    "CompanyName": "SHANNA Digital Systems",
+    "CompanyName": "Shanna Studio",
     "FileDescription": "Nawam Bootable USB Creator",
-    "FileVersion": "1.0.0",
+    "FileVersion": "1.0.1",
     "InternalName": "Nawam",
-    "LegalCopyright": "Copyright \u00a9 2026 SHANNA Digital Systems; upstream \u00a9 2011-2026 Pete Batard (GPL v3+)",
+    "LegalCopyright": "Copyright \u00a9 2026 Shanna Studio; upstream \u00a9 2011-2026 Pete Batard (GPL v3+)",
     "LegalTrademarks": "https://www.gnu.org/licenses/gpl-3.0.html",
     "OriginalFilename": "Nawam.exe",
     "ProductName": "Nawam",
-    "ProductVersion": "1.0.0"
+    "ProductVersion": "1.0.1"
   },
   "embedded_text_bytes": {
-    "about_blurb_format": 204,
-    "legal_notice_format": 623,
+    "about_blurb_format": 154,
+    "legal_notice_format": 614,
     "additional_copyrights": 4744,
     "gplv3": 33091
   },
@@ -136,5 +136,5 @@
   },
   "pe_checks": "x64 Windows GUI, DEP, ASLR, DependentLoadFlags=0x800",
   "live_ui": "Not verified: QA process is not elevated",
-  "canonical_publish": "Blocked: replacing dist/Nawam.exe returned WinError 5"
+  "canonical_publish": "Verified: canonical executable matches this artifact"
 }

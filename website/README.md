@@ -35,7 +35,8 @@ source ZIP from an explicit project allowlist, without installed toolchains,
 account configuration or credentials. It generates release.json and SHA256SUMS.
 Downloads are excluded from git AND Firebase deploy: the Spark plan forbids EXE files.
 Upload the generated Nawam.exe, source ZIP and SHA256SUMS.txt to
-https://github.com/shannacore/nawam-releases/releases/tag/v1.0.0 before deploying.
+https://github.com/shannacore/nawam-releases/releases/tag/v1.0.1 before deploying.
+Application website metadata uses https://nawam.shanna.id; Firebase stays nawam.web.app.
 Never change Firebase billing or disguise an executable to bypass this restriction.
 
 ## Deploy

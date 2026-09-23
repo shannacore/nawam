@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#define NAWAM_WEBSITE "https://nawam.web.app"
+#define NAWAM_WEBSITE "https://nawam.shanna.id"
 /* No release feed/signing authority is configured for Nawam yet.
  * Never use Rufus release metadata or executables as Nawam updates.
  * Future work requires a dedicated signed feed and an independent verifier;

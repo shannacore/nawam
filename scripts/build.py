@@ -71,8 +71,10 @@ with log_path.open("w", encoding="utf-8") as log:
     assert pe.DIRECTORY_ENTRY_LOAD_CONFIG.struct.DependentLoadFlags == 0x800
     info = {k.decode(): v.decode() for group in pe.FileInfo for item in group
             if hasattr(item, "StringTable") for table in item.StringTable for k, v in table.entries.items()}
-    assert info["ProductName"] == "Nawam" and info["FileVersion"] == "1.0.0"
+    assert info["ProductName"] == "Nawam" and info["FileVersion"] == "1.0.1"
     assert info["OriginalFilename"] == "Nawam.exe"
+    assert info["CompanyName"] == "Shanna Studio"
+    assert info["Comments"] == "https://nawam.shanna.id"
     pe.close()
     os.replace(staged, output)
     digest = hashlib.sha256(output.read_bytes()).hexdigest()

@@ -23,10 +23,10 @@ class AboutTests(unittest.TestCase):
     def test_simple_about_and_separate_legal_notices(self):
         header = source("src/license.h")
         template = about_format(header)
-        for text in ("Nawam", "Bootable USB Creator", "SHANNA Digital Systems",
-                     "https://nawam.web.app"):
+        for text in ("Nawam", "Bootable USB Creator", "Shanna Studio",
+                     "https://nawam.shanna.id"):
             self.assertIn(text, template)
-        for text in ("Rufus", "Pete Batard", "Axialis", "MSG_176"):
+        for text in ("Rufus", "Pete Batard", "Axialis", "MSG_176", "Developed by", "SHANNA Digital Systems"):
             self.assertNotIn(text, template)
         self.assertEqual(template.count("%d"), 3)
         dialogs = source("src/stdlg.c")

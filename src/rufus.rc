@@ -33,7 +33,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDD_DIALOG DIALOGEX 12, 12, 232, 326
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_ACCEPTFILES
-CAPTION "Nawam 1.0.0"
+CAPTION "Nawam 1.0.1"
 FONT 9, "Segoe UI Symbol", 400, 0, 0x0
 BEGIN
     LTEXT           "Drive Properties",IDS_DRIVE_PROPERTIES_TXT,8,6,53,12,NOT WS_GROUP
@@ -412,8 +412,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,0,1,0
+ PRODUCTVERSION 1,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -428,16 +428,16 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "https://nawam.web.app"
-            VALUE "CompanyName", "SHANNA Digital Systems"
+            VALUE "Comments", "https://nawam.shanna.id"
+            VALUE "CompanyName", "Shanna Studio"
             VALUE "FileDescription", "Nawam Bootable USB Creator"
-            VALUE "FileVersion", "1.0.0"
+            VALUE "FileVersion", "1.0.1"
             VALUE "InternalName", "Nawam"
-            VALUE "LegalCopyright", "Copyright © 2026 SHANNA Digital Systems; upstream © 2011-2026 Pete Batard (GPL v3+)"
+            VALUE "LegalCopyright", "Copyright © 2026 Shanna Studio; upstream © 2011-2026 Pete Batard (GPL v3+)"
             VALUE "LegalTrademarks", "https://www.gnu.org/licenses/gpl-3.0.html"
             VALUE "OriginalFilename", "Nawam.exe"
             VALUE "ProductName", "Nawam"
-            VALUE "ProductVersion", "1.0.0"
+            VALUE "ProductVersion", "1.0.1"
         END
     END
     BLOCK "VarFileInfo"

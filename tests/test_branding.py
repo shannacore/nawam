@@ -21,19 +21,19 @@ class BrandingTests(unittest.TestCase):
             "FileDescription": "Nawam Bootable USB Creator",
             "InternalName": "Nawam",
             "OriginalFilename": "Nawam.exe",
-            "CompanyName": "SHANNA Digital Systems",
-            "FileVersion": "1.0.0",
-            "ProductVersion": "1.0.0",
-            "Comments": "https://nawam.web.app",
+            "CompanyName": "Shanna Studio",
+            "FileVersion": "1.0.1",
+            "ProductVersion": "1.0.1",
+            "Comments": "https://nawam.shanna.id",
         }.items():
             self.assertIn(f'VALUE "{field}", "{value}"', resource)
-        self.assertIn('CAPTION "Nawam 1.0.0"', resource)
-        self.assertIn("FILEVERSION 1,0,0,0", resource)
-        self.assertIn("PRODUCTVERSION 1,0,0,0", resource)
+        self.assertIn('CAPTION "Nawam 1.0.1"', resource)
+        self.assertIn("FILEVERSION 1,0,1,0", resource)
+        self.assertIn("PRODUCTVERSION 1,0,1,0", resource)
         self.assertIn('"../res/nawam.ico"', resource)
         self.assertNotRegex(resource, r'CAPTION "[^"]*Rufus')
         self.assertIn("Pete Batard", resource)
-        self.assertIn("2026 SHANNA Digital Systems", resource)
+        self.assertIn("2026 Shanna Studio", resource)
 
 
 class IsolationTests(unittest.TestCase):
@@ -54,7 +54,7 @@ class IsolationTests(unittest.TestCase):
     def test_about_semver_and_fork_support(self):
         about = source("src/license.h").split('const char* legal_notice_format', 1)[0]
         self.assertIn('Nawam %d.%d.%d', about)
-        self.assertIn('https://nawam.web.app', about)
+        self.assertIn('https://nawam.shanna.id', about)
 
     def test_generated_branding_links(self):
         self.assertIn('LTEXT(NAWAM_WEBSITE)', source("src/icon.c"))

@@ -40,7 +40,7 @@ async function loadRelease() {
     const release = await response.json();
     if (!release.available || !/^[a-f0-9]{64}$/.test(release.sha256)) return;
     // Only the audited Nawam GitHub release. Reject arbitrary external URLs.
-    if (release.url !== 'https://github.com/shannacore/nawam-releases/releases/download/v1.0.0/Nawam.exe') return;
+    if (release.url !== 'https://github.com/shannacore/nawam-releases/releases/download/v1.0.1/Nawam.exe') return;
     const button = document.getElementById('download-button');
     if (!button) return;
     button.href = release.url;

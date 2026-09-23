@@ -14,7 +14,7 @@ exe = ROOT / 'dist/Nawam.exe'
 pe = pefile.PE(str(exe))
 info = {k.decode(): v.decode() for group in pe.FileInfo for item in group
         if hasattr(item, 'StringTable') for table in item.StringTable for k, v in table.entries.items()}
-assert info['ProductName'] == 'Nawam' and info['FileVersion'] == '1.0.0'
+assert info['ProductName'] == 'Nawam' and info['FileVersion'] == '1.0.1'
 assert pe.FILE_HEADER.Machine == 0x8664
 assert pe.DIRECTORY_ENTRY_LOAD_CONFIG.struct.DependentLoadFlags == 0x800
 pe.close()
@@ -31,7 +31,7 @@ assert not any(x in file for file in files for x in ('node_modules', 'service-ac
 dest = WEB / 'downloads'
 dest.mkdir(exist_ok=True)
 shutil.copy2(exe, dest / 'Nawam.exe')
-archive = dest / 'Nawam-1.0.0-source.zip'
+archive = dest / 'Nawam-1.0.1-source.zip'
 with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     for file in files:
         z.write(ROOT / file, 'Nawam/' + file)
@@ -40,11 +40,11 @@ with zipfile.ZipFile(archive) as z:
     assert len(z.namelist()) == len(files)
     assert z.read('Nawam/src/rufus.c') == (ROOT / 'src/rufus.c').read_bytes()
 hash_of = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-manifest = {'version':'1.0.0', 'available':True, 'architecture':'x64',
-            'url':'https://github.com/shannacore/nawam-releases/releases/download/v1.0.0/Nawam.exe', 'sha256':hash_of(exe),
-            'bytes':exe.stat().st_size, 'sourceUrl':'https://github.com/shannacore/nawam-releases/releases/download/v1.0.0/Nawam-1.0.0-source.zip',
+manifest = {'version':'1.0.1', 'available':True, 'architecture':'x64',
+            'url':'https://github.com/shannacore/nawam-releases/releases/download/v1.0.1/Nawam.exe', 'sha256':hash_of(exe),
+            'bytes':exe.stat().st_size, 'sourceUrl':'https://github.com/shannacore/nawam-releases/releases/download/v1.0.1/Nawam-1.0.1-source.zip',
             'sourceSha256':hash_of(archive), 'sourceFiles':len(files), 'signed':False}
 (WEB / 'release.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
-(dest / 'SHA256SUMS.txt').write_text(hash_of(exe)+'  Nawam.exe\n'+hash_of(archive)+'  Nawam-1.0.0-source.zip\n')
+(dest / 'SHA256SUMS.txt').write_text(hash_of(exe)+'  Nawam.exe\n'+hash_of(archive)+'  Nawam-1.0.1-source.zip\n')
 (ROOT / 'dist/SHA256SUMS.txt').write_text(hash_of(exe)+'  Nawam.exe\n')
 print(json.dumps(manifest, indent=2))
